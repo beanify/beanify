@@ -127,7 +127,7 @@ class RouteContext {
         _chain.RunHook('onRequest', { natsRequest, natsReplyTo, log }, (err) => {
             if (this._checkNoError(err)) {
                 const req = {}
-                req.request = natsRequest || {}
+                req.request = natsRequest
                 req.request.url = topicUrl
                 req.request.routeUrl = url
 
