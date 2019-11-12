@@ -447,3 +447,37 @@ tap.test('beanify-chain test with onAfterHandler promise style', (t) => {
         },2000)
     })
 })
+
+tap.test('beanify-chain test with onRoute error', (t) => {
+
+    t.plan(2)
+
+    const b = new Beanify({
+        nats: Object.assign({}, helper.nats)
+    })
+
+    b.register(beanifyPlugin((beanify, opts, done) => {
+
+
+        beanify.addHook('onRoute',({route})=>{
+            // route.$options.url='asdasdasd'
+            // console.log('00->>>>>>>>>>>>>>',route.$options)
+            throw new Error('onRoute.error')
+        })
+        beanify.addHook('onError',({err})=>{
+            // console.log('11->>>>>>>>>>>>>>',err)
+            t.equal(err.message,'onRoute.error','check error message')
+            b.close()
+        })
+
+        beanify.route({
+            url:'math.addtt',
+        },(req,res)=>{
+            res(null,1)
+        })
+
+        done()
+    })).ready((err)=>{
+        t.error(err,'check err')        
+    })
+})

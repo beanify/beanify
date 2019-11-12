@@ -78,46 +78,49 @@ class RouteContext {
     }
 
     registerService(done) {
-        const { _transport: nats } = this
+        const { _transport: nats, _chain, _log } = this
 
-        const {
-            $pubsub,
-            $max,
-            $timeout,
-            url
-        } = this.$options
+        _chain.RunHook('onRoute', { route: this, log: _log }, (err) => {
+            const {
+                $pubsub,
+                $max,
+                $timeout,
+                url
+            } = this.$options
 
-        // if (nats.$connected) {
-        const queue = `queue.${url}`
+            if (this._checkNoError(err)) {
+                const queue = `queue.${url}`
 
-        if ($pubsub) {
-            this._sid = nats.subscribe(url, {
-                max: $max
-            }, this._doRequest.bind(this))
-        } else {
-            this._sid = nats.subscribe(url, {
-                queue,
-                max: $max
-            }, this._doRequest.bind(this))
-        }
+                if ($pubsub) {
+                    this._sid = nats.subscribe(url, {
+                        max: $max
+                    }, this._doRequest.bind(this))
+                } else {
+                    this._sid = nats.subscribe(url, {
+                        queue,
+                        max: $max
+                    }, this._doRequest.bind(this))
+                }
 
-        nats.flush(() => {
-            if ($timeout > 0) {
-                clearTimeout(tmrId);
+                nats.flush(() => {
+                    if ($timeout > 0 && tmrId != -1) {
+                        clearTimeout(tmrId);
+                    }
+                    done && done(null, true)
+                })
+                let tmrId
+                if ($timeout > 0) {
+                    tmrId = setTimeout(() => {
+                        const _done = done;
+                        tmrId = -1
+                        done = null;
+                        _done(null, false)
+                    }, $timeout)
+                }
+            } else {
+                done(err);
             }
-            done && done(true)
         })
-        let tmrId
-        if ($timeout > 0) {
-            tmrId = setTimeout(() => {
-                const _done = done;
-                done = null;
-                _done(false)
-            }, $timeout)
-        }
-        // } else {
-        //     done(false);
-        // }
     }
 
     _doRequest(natsRequest, natsReplyTo, topicUrl) {
@@ -379,13 +382,11 @@ class Router {
         // })
 
         this._routeQ = FastQ(this, (route, done) => {
-            route.registerService((sendOk) => {
-                if (sendOk) {
-                    $chain.RunHook('onRoute', { route, log: $log }, done)
-                } else {
+            route.registerService((err, isOk) => {
+                if (isOk === false) {
                     this._routeQ.push(route)
-                    done()
                 }
+                done(err)
             })
         }, 1)
         this._routeQ.drain = () => {
