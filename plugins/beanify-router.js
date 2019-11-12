@@ -160,7 +160,8 @@ class RouteContext {
 
         const reqParams = {
             body: Object.assign({}, req.request.body),
-            url: req.request.url
+            url: req.request.url,
+            routeUrl: req.request.routeUrl
         }
         let sent = false;
         _chain.RunHook('onHandler', { context, req: reqParams, log }, (err) => {
