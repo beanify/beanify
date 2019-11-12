@@ -307,7 +307,7 @@ class InjectContext {
                         reqOpts.max = expected || max;
                     }
 
-                    const _confInbox = _transport.request(url, payload, reqOpts, (reply) => {
+                    const conf = _transport.request(url, payload, reqOpts, (reply) => {
                         if (reply.code && reply.code === NATS.REQ_TIMEOUT) {
 
                             this._checkNoError(reply)
@@ -320,14 +320,14 @@ class InjectContext {
                     })
 
                     if (expected > 0) {
-                        _transport.timeout(_confId, timeout, expected, () => {
+                        _transport.timeout(conf.confId, timeout, expected, () => {
                             const err = new errors.BeanifyError(`Inject timeout:${url}`);
                             context._excute(err)
                             this._doAfterInject({ err, context })
                         })
                     }
 
-                    _transport.on(_confInbox, (sid) => {
+                    _transport.on(conf.inbox, (sid) => {
                         this._doAfterInject({ replys, context })
                     })
                 }

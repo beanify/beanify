@@ -61,10 +61,12 @@ class Transport extends EventEmitter{
 
     request(topic,msg,opts,cb){
         const confId= this._nats.request(topic,msg,opts,cb)
-        return this._nats.getMuxRequestConfig(confId).inbox
+        const inbox=this._nats.getMuxRequestConfig(confId).inbox
+        return {confId,inbox}
     }
 
     timeout(sid,timeout,expected,cb){
+
         return this._nats.timeout(sid,timeout,expected,cb)
     }
 

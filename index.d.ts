@@ -49,9 +49,9 @@ declare namespace Beanify {
         publish(topic: string, msg: any, cb: Function): void
         publish(topic: string, msg: any, reply: string, cb: Function): void
         
-        request(topic:string,cb:Function):string
-        request(topic:string,msg:any,cb:Function):string
-        request(topic:string,msg:any,options:NATS.SubscribeOptions,cb:Function):string
+        request(topic:string,cb:Function):{confId:number,inbox:string}
+        request(topic:string,msg:any,cb:Function):{confId:number,inbox:string}
+        request(topic:string,msg:any,options:NATS.SubscribeOptions,cb:Function):{confId:number,inbox:string}
         
         timeout(sid: number, timeout: number, expected: number, cb: (sid: number) => void):void
 
