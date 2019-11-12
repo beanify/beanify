@@ -1,0 +1,27 @@
+  
+kind: pipeline
+name: default
+
+steps:
+  
+  - name: build
+    image: node:10.16-alpine
+    commands:
+      - npm test
+      # - npm run aaa
+    # volumes:
+    #   - name: cache
+    #     host:
+    #       path: $$pwd
+
+services:
+- name: natsd
+  image: nats:latest
+  command: 
+    - "--user"
+    - "testuser"
+    - "--pass"
+    - "testpass"
+    # - '-DV'
+  ports:
+    - 4222
