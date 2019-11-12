@@ -120,15 +120,17 @@ class RouteContext {
         // }
     }
 
-    _doRequest(natsRequest, natsReplyTo) {
+    _doRequest(natsRequest, natsReplyTo, topicUrl) {
         const { _transport, _chain, _log: log } = this
         const { url, _handler } = this.$options
 
         _chain.RunHook('onRequest', { natsRequest, natsReplyTo, log }, (err) => {
             if (this._checkNoError(err)) {
                 const req = {}
-                req.url = url
-                req.request = natsRequest
+                req.request = natsRequest || {}
+                req.request.url = topicUrl
+                req.request.routeUrl = url
+
                 req.replyTo = natsReplyTo
                 this._doBeforeHandler({ req })
             }
@@ -157,7 +159,8 @@ class RouteContext {
         }
 
         const reqParams = {
-            body: Object.assign({}, req.request.body)
+            body: Object.assign({}, req.request.body),
+            url: req.request.url
         }
         let sent = false;
         _chain.RunHook('onHandler', { context, req: reqParams, log }, (err) => {
