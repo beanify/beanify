@@ -4,7 +4,7 @@ const beanifyPlugin = require("beanify-plugin")
 
 const AJV = require("ajv")
 const FastQ = require("fastq")
-const { Qlobber } = require('qlobber')
+// const { Qlobber } = require('qlobber')
 
 const errors = require("../errors")
 const Util = require("../util")
@@ -368,11 +368,11 @@ class Router {
             _chain: $chain,
             _log: $log
         })
-        this._matcher = new Qlobber({
-            separator: '.',
-            wildcard_one: '*',
-            wildcard_some: '>'
-        })
+        // this._matcher = new Qlobber({
+        //     separator: '.',
+        //     wildcard_one: '*',
+        //     wildcard_some: '>'
+        // })
 
         this._routeQ = FastQ(this, (route, done) => {
             route.registerService((sendOk) => {
@@ -407,9 +407,9 @@ class Router {
         setImmediate(done)
     }
 
-    get $matcher() {
-        return this._matcher;
-    }
+    // get $matcher() {
+    //     return this._matcher;
+    // }
 
     route(opts, onRequest) {
 
@@ -447,12 +447,12 @@ class Router {
             _log: $log
         })
 
-        const matchs = this._matcher.match(opts.url);
-        this._matcher.add(opts.url, service);
+        // const matchs = this._matcher.match(opts.url);
+        // this._matcher.add(opts.url, service);
 
-        if (matchs.length == 0) {
-            this._routeQ.push(service);
-        }
+        // if (matchs.length == 0) {
+        this._routeQ.push(service);
+        // }
 
         return this._parent;
     }
