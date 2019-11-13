@@ -131,10 +131,9 @@ class RouteContext {
             if (this._checkNoError(err)) {
                 const req = {}
                 req.request = natsRequest
-                req.request.url = topicUrl
-                req.request.routeUrl = url
-
+                req.request.fromUrl = topicUrl
                 req.replyTo = natsReplyTo
+                
                 this._doBeforeHandler({ req })
             }
         })
@@ -163,8 +162,7 @@ class RouteContext {
 
         const reqParams = {
             body: Object.assign({}, req.request.body),
-            url: req.request.url,
-            routeUrl: req.request.routeUrl
+            fromUrl: req.request.fromUrl
         }
         let sent = false;
         _chain.RunHook('onHandler', { context, req: reqParams, log }, (err) => {
@@ -224,6 +222,10 @@ class InjectContext {
         this._log = _log;
     }
 
+    get $options(){
+        return this._opts
+    }
+
     inject(opts, onResponsed) {
         const ajv = new AJV({ useDefaults: true })
 
@@ -279,6 +281,7 @@ class InjectContext {
 
         _chain.RunHook('onBeforeInject', { context, options: injectOptions, log }, (err) => {
             if (this._checkNoError(err)) {
+                this._opts=injectOptions
                 this._doInject({ context, payload })
             }
         })

@@ -129,7 +129,7 @@ tap.test('beanify-router "onRoute" hook test', (t) => {
 
 tap.test('beanify-router.inject test', (t) => {
 
-    t.plan(6)
+    t.plan(7)
 
     const beanify = new Beanify({
         nats: Object.assign({}, helper.nats),
@@ -140,7 +140,7 @@ tap.test('beanify-router.inject test', (t) => {
         instance.route({
             url: 'math.add',
         }, function (req, res) {
-            // console.log({ req })
+            
             const { body } = req;
             const result = body.a + body.b
             if (result < 5) {
@@ -163,7 +163,7 @@ tap.test('beanify-router.inject test', (t) => {
         }, function (err, res) {
             t.error(err, 'check inject.err')
             t.equal(res, 3, 'check math.add service')
-
+            t.equal(this.$options.url,'math.add','check $options.url')
             this.inject({
                 url: 'math.add',
                 body: {
