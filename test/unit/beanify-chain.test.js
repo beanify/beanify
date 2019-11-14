@@ -18,7 +18,7 @@ tap.test('beanify-chain types test', (t) => {
             'onClose', // beanify avvio
             'onRoute', // register route
             'onBeforeInject', 'onInject', 'onAfterInject', // process inject
-            'onRequest', 'onBeforeHandler', 'onHandler', 'onAfterHandler', 'onResposed',//process request
+            'onRequest', 'onBeforeHandler', 'onHandler', 'onAfterHandler', 'onResponse',//process request
             'onError', // request process error
         ],'check $chain event types')
         b.close()
@@ -368,11 +368,11 @@ tap.test('beanify-chain test with onAfterHandler error', (t) => {
             res(null,2)
         })
 
-        beanify.addHook('onResposed',()=>{
-            throw new Error('onResposed.error')
+        beanify.addHook('onResponse',()=>{
+            throw new Error('onResponse.error')
         })
         beanify.addHook('onError',({err})=>{
-            t.equal(err.message,'onResposed.error','check error message')
+            t.equal(err.message,'onResponse.error','check error message')
             b.close()
         })
         done()

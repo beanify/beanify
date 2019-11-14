@@ -21,7 +21,7 @@ class ProcessChain {
         this._onBeforeHandler = []   //{context,natsRequest,log} 
         this._onHandler = []        //{context,req,log}
         this._onAfterHandler = []   //{context,req,res,log}
-        this._onResposed = []       //{context,natsResponse,log}
+        this._onResponse = []       //{context,natsResponse,log}
        
 
 
@@ -32,7 +32,7 @@ class ProcessChain {
             'onClose', // beanify avvio
             'onRoute', // register route
             'onBeforeInject', 'onInject', 'onAfterInject', // process inject
-            'onRequest', 'onBeforeHandler', 'onHandler', 'onAfterHandler', 'onResposed',//process request
+            'onRequest', 'onBeforeHandler', 'onHandler', 'onAfterHandler', 'onResponse',//process request
             'onError', // request process error
         ]
 

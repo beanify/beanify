@@ -157,7 +157,7 @@ class RouteContext {
         const { _transport, _chain, _log: log } = this
         const { url, _handler } = this.$options
         context.write = (data) => {
-            this._doResposed({ context, res: data, replyTo: req.replyTo })
+            this._doResponse({ context, res: data, replyTo: req.replyTo })
         }
 
         const reqParams = {
@@ -184,17 +184,17 @@ class RouteContext {
         const { _transport, _chain, _log: log } = this
         _chain.RunHook('onAfterHandler', { context, req, res, log }, (err) => {
             if (this._checkNoError(err)) {
-                this._doResposed({ context, res, replyTo })
+                this._doResponse({ context, res, replyTo })
             }
         })
     }
 
-    _doResposed({ context, res, replyTo }) {
+    _doResponse({ context, res, replyTo }) {
         const { _transport, _chain, _log: log } = this
 
         const natsResponse = {
         }
-        _chain.RunHook('onResposed', { context, natsResponse, log }, (err) => {
+        _chain.RunHook('onResponse', { context, natsResponse, log }, (err) => {
             if (this._checkNoError(err)) {
                 natsResponse.payload = res;
                 _transport.publish(replyTo, natsResponse)

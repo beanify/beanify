@@ -67,7 +67,7 @@ declare namespace Beanify {
         | 'onRequest'
         | 'onBeforeHandler'
         | 'onHandler'
-        | 'onReposed'
+        | 'onResponse'
         | 'onAfterHandler'
         | 'onError'
 
