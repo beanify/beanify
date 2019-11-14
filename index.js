@@ -37,7 +37,7 @@ class Beanify {
             if (meta) {
                 beanify._checkPluginDependencies(plugin)
                 beanify._checkPluginDecorators(plugin)
-                beanify[sPluginNames].push(meta.name);
+                this._self[sPluginNames].push(meta.name);
             } else {
                 throw new errors.BeanifyError('Encapsulation error, need to encapsulate the plugin with beanify-plugin')
             }
@@ -66,7 +66,6 @@ class Beanify {
                 })
             }
 
-            scopedInstance[sPluginNames] = Object.create(beanify[sPluginNames])
 
             //add hook
 
@@ -99,7 +98,7 @@ class Beanify {
     }
 
     get $plugins() {
-        return this[sPluginNames]
+        return this._self[sPluginNames]
     }
 
     decorate(prop, value, deps) {
@@ -151,7 +150,7 @@ class Beanify {
         }
 
         dependencies.forEach((dependency) => {
-            if (this[sPluginNames].indexOf(dependency) === -1) {
+            if (this._self[sPluginNames].indexOf(dependency) === -1) {
                 throw new errors.BeanifyError(`The dependency '${dependency}' is not registered`)
             }
         })
