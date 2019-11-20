@@ -103,8 +103,9 @@ class RouteContext {
                 }
 
                 nats.flush(() => {
-                    if ($timeout > 0 && tmrId != -1) {
+                    if ($timeout > 0 && tmrId !== null) {
                         clearTimeout(tmrId);
+                        tmrId=null
                     }
                     done && done(null, true)
                 })
@@ -112,7 +113,7 @@ class RouteContext {
                 if ($timeout > 0) {
                     tmrId = setTimeout(() => {
                         const _done = done;
-                        tmrId = -1
+                        tmrId = null
                         done = null;
                         _done(null, false)
                     }, $timeout)
@@ -133,7 +134,7 @@ class RouteContext {
                 req.request = natsRequest
                 req.request.fromUrl = topicUrl
                 req.replyTo = natsReplyTo
-                
+
                 this._doBeforeHandler({ req })
             }
         })
@@ -222,7 +223,7 @@ class InjectContext {
         this._log = _log;
     }
 
-    get $options(){
+    get $options() {
         return this._opts
     }
 
@@ -281,7 +282,7 @@ class InjectContext {
 
         _chain.RunHook('onBeforeInject', { context, options: injectOptions, log }, (err) => {
             if (this._checkNoError(err)) {
-                this._opts=injectOptions
+                this._opts = injectOptions
                 this._doInject({ context, payload })
             }
         })
@@ -317,7 +318,11 @@ class InjectContext {
                         reqOpts.max = expected || max;
                     }
 
-                    const conf = _transport.request(url, payload, reqOpts, (reply) => {
+                    context.close = () => {
+                        _transport.unsubscribe(context.$channel)
+                    }
+
+                    context.$channel = _transport.request(url, payload, reqOpts, (reply) => {
                         if (reply.code && reply.code === NATS.REQ_TIMEOUT) {
 
                             this._checkNoError(reply)
@@ -337,7 +342,7 @@ class InjectContext {
                         })
                     }
 
-                    _transport.on(conf.inbox, (sid) => {
+                    _transport.onUnsubscribe(context.$channel, () => {
                         this._doAfterInject({ replys, context })
                     })
                 }

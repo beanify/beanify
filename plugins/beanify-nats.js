@@ -1,12 +1,10 @@
 const beanifyPlugin = require("beanify-plugin")
 const NATS = require("nats")
-const {EventEmitter} =require("events")
 
 const connCodes = ['CONN_ERR', NATS.SECURE_CONN_REQ, NATS.NON_SECURE_CONN_REQ, NATS.CLIENT_CERT_REQ]
 
-class Transport extends EventEmitter{
+class Transport{
     constructor({ beanify, opts, done }) {
-        super()
 
         this._opts = Object.assign({},opts)
         this._nats = NATS.connect(this._opts)
@@ -55,14 +53,16 @@ class Transport extends EventEmitter{
         return this._nats.subscribe(topic,opts,cb)
     }
 
+    unsubscribe(sid){
+        return this._nats.unsubscribe(sid)
+    }
+
     publish(topic,msg,reply,cb){
         return this._nats.publish(topic,msg,reply,cb)
     }
 
     request(topic,msg,opts,cb){
-        const confId= this._nats.request(topic,msg,opts,cb)
-        const inbox=this._nats.getMuxRequestConfig(confId).inbox
-        return {confId,inbox}
+        return this._nats.request(topic,msg,opts,cb)
     }
 
     timeout(sid,timeout,expected,cb){
@@ -74,6 +74,10 @@ class Transport extends EventEmitter{
         this._nats.flush(cb)
     }
     
+    onUnsubscribe(sid,cb){
+        const inbox=this._nats.getMuxRequestConfig(sid).inbox
+        this._nats.on(inbox,cb)
+    }
 }
 
 module.exports = beanifyPlugin((beanify, opts, done) => {
