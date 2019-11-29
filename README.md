@@ -14,6 +14,8 @@ Beanify is an improvement from [Hemera](https://github.com/hemerajs/hemera). Fir
 
 ## Documentation
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/beanjs-framework/beanify.svg)](https://greenkeeper.io/)
+
 * [Installation](./docs/installation.md)
 * [lifecycle Hook](./docs/lifecycle-hook.md)
 * [Request and Reply](./docs/request-and-reply.md)
