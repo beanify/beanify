@@ -31,7 +31,7 @@ class Transport {
     })
 
     this._nats.on('unsubscribe', (sid, topic) => {
-      this.emit(topic, sid)
+      this._nats.emit(topic, sid)
     })
 
     this._parent.onClose((instance, done) => {
