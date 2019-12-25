@@ -168,15 +168,18 @@ class RouteContext {
       if (context.$max > 1 &&
         context.$current < context.$max &&
         context.$closed === false) {
-        context.$current++
+
 
         if (context.$channel && context.$closed === false) {
           nats.publish(context.$channel, {
-            res: data, code: 200
+            res: data,
+            code: 200,
+            $current: context.$current
           })
           repData.items.push(data)
         }
 
+        context.$current++
         if (context.$current >= context.$max) {
           context.$closed = true
           this._doAfterHandler({ context, req: reqParams, res: repData })
@@ -360,12 +363,11 @@ class InjectContext {
             nats.unsubscribe(context.$channel)
           }
 
-          context.$current = 0
           context.$channel = nats.request(url, payload, reqOpts, (reply) => {
             if (reply.code) {
               if (reply.code === 200) {
+                context.$current = reply.$current 
                 context._excute(null, reply.res)
-                context.$current++
                 replys.items.push(reply.res)
               } else if (reply.code === 404) {
                 context._excute(Errio.parse(reply.res))
