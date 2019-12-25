@@ -72,27 +72,6 @@ tap.test('beanify-router.route options.prefix test ', (t) => {
   })
 })
 
-tap.test('beanify-router.route test with $timeout', (t) => {
-  t.plan(1)
-
-  const b1 = new Beanify({
-    nats: Object.assign({}, helper.nats)
-  })
-
-  b1.register(beanifyPlugin((instance, opts, done) => {
-    instance.route({
-      url: 'math.add',
-      $timeout: 1
-    }, () => {
-
-    })
-    done()
-  })).ready((err) => {
-    t.error(err)
-    b1.close()
-  })
-})
-
 tap.test('beanify-router "onRoute" hook test', (t) => {
   t.plan(4)
 
@@ -263,7 +242,7 @@ tap.test('beanify-router.inject test with promise error', (t) => {
       t.ok(false, 'check inject.err will throw error')
       beanify.close()
     }).catch((err) => {
-      t.equal(err.code, 'REQ_TIMEOUT', 'check inject.err')
+      t.equal(err.message, 'test error message', 'check inject.err')
       beanify.close()
     })
 

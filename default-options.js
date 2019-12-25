@@ -22,22 +22,13 @@ const defaultSchema = {
       type: 'string',
       default: `beanity-${OS.hostname()}-${Util.generateRandomId()}`
     },
-    log: {
+    pino: {
       type: 'object',
       properties: {
-        usePretty: {
-          type: ['boolean', 'object'],
-          default: false
-        },
         level: {
           enum: ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'],
           default: 'warn'
-        },
-        useChild: {
-          type: 'boolean',
-          default: false
         }
-
       },
       default: {}
     },

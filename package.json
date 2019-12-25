@@ -1,16 +1,17 @@
 {
   "name": "beanify",
-  "version": "1.0.11",
+  "version": "1.1.0",
   "description": "micro-services nats nats-micro-services",
   "main": "index.js",
   "scripts": {
-    "test": "standard && tap test/**/*.test.js --100 --cov --coverage-report=text",
+    "test": "standard && tap test/**/*.test.js ",
     "unit": "tap test/**/*.test.js --100 --cov --coverage-report=lcov",
     "aaa": "tap test/**/beanify-router.test.js --100 --cov --coverage-report=text"
   },
   "author": "beanjs",
   "license": "MIT",
   "devDependencies": {
+    "pino-pretty": "^3.5.0",
     "standard": "^14.3.1",
     "tap": "^14.9.1"
   },

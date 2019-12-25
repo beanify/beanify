@@ -4,6 +4,7 @@ const beanifyPlugin = require('beanify-plugin')
 
 const AJV = require('ajv')
 const FastQ = require('fastq')
+const Errio = require('errio')
 // const { Qlobber } = require('qlobber')
 
 const errors = require('../errors')
@@ -65,12 +66,10 @@ const defaultInjectOptionsSchema = {
 }
 
 class RouteContext {
-  constructor (opts, { _transport, _chain, _log }) {
+  constructor (opts, instance) {
     this._opts = opts
     this._sid = -1
-    this._transport = _transport
-    this._chain = _chain
-    this._log = _log
+    this.$instance = instance
   }
 
   get $options () {
@@ -78,9 +77,9 @@ class RouteContext {
   }
 
   registerService (done) {
-    const { _transport: nats, _chain, _log } = this
+    const { $transport: nats, $chain, $log } = this.$instance
 
-    _chain.RunHook('onRoute', { route: this, log: _log }, (err) => {
+    $chain.RunHook('onRoute', { route: this, log: $log }, (err) => {
       const {
         $pubsub,
         $max,
@@ -125,53 +124,69 @@ class RouteContext {
   }
 
   _doRequest (natsRequest, natsReplyTo, topicUrl) {
-    const { _chain, _log: log } = this
-    // const { url, _handler } = this.$options
+    const { $chain, $log: log } = this.$instance
 
-    _chain.RunHook('onRequest', { natsRequest, natsReplyTo, log }, (err) => {
-      if (this._checkNoError(err)) {
-        const req = {}
-        req.request = natsRequest
-        req.request.fromUrl = topicUrl
-        req.replyTo = natsReplyTo
-
-        this._doBeforeHandler({ req })
-      }
-    })
-  }
-
-  _doBeforeHandler ({ req }) {
-    const { _chain, _log: log } = this
-    // const { url, _handler } = this.$options
+    natsRequest.fromUrl = topicUrl
 
     const context = Object.create(this)
-    _chain.RunHook('onBeforeHandler', { context, natsRequest: req.request, log }, (err) => {
+    context.$channel = natsReplyTo
+    context.$current = 0
+    context.$closed = false
+    context.$max = natsRequest.$max || 1
+
+    $chain.RunHook('onRequest', { natsRequest, natsReplyTo, log }, (err) => {
       if (this._checkNoError(err)) {
-        this._doHandler({ context, req })
+        this._doBeforeHandler({ natsRequest, context })
       }
     })
   }
 
-  _doHandler ({ context, req }) {
-    const { _chain, _log: log } = this
+  _doBeforeHandler ({ natsRequest, context }) {
+    const { $chain, $log: log } = this.$instance
+
+    $chain.RunHook('onBeforeHandler', { context, natsRequest, log }, (err) => {
+      if (this._checkNoError(err)) {
+        this._doHandler({ context, natsRequest })
+      }
+    })
+  }
+
+  _doHandler ({ context, natsRequest }) {
+    const { $chain, $log: log } = this.$instance
     const { _handler } = this.$options
-    context.write = (data) => {
-      this._doResponse({ context, res: data, replyTo: req.replyTo })
-    }
 
     const reqParams = {
-      body: Object.assign({}, req.request.body),
-      fromUrl: req.request.fromUrl
+      body: Object.assign({}, natsRequest.body),
+      fromUrl: natsRequest.fromUrl
     }
-    let sent = false
-    _chain.RunHook('onHandler', { context, req: reqParams, log }, (err) => {
+
+    context.write = (data) => {
+      if (context.$current < context.$max &&
+        context.$closed === false) {
+        context.$current++
+        this._doResponse({ context, code: 200, res: data })
+
+        if (context.$current >= context.$max) {
+          context.$closed = true
+          this._doAfterHandler({ context, req: reqParams, res: data })
+        }
+      }
+    }
+
+    context.error = (err) => {
+      this._doResponse({ context, code: 404, res: Errio.stringify(err) })
+      context.$closed = true
+      this._doAfterHandler({ context, req: reqParams, res: err })
+    }
+
+    $chain.RunHook('onHandler', { context, req: reqParams, log }, (err) => {
       if (this._checkNoError(err)) {
-        const scopeExcute = _handler.bind(context)
-        scopeExcute(reqParams, (err, res) => {
-          if (!sent) {
-            sent = true
-            if (this._checkNoError(err)) {
-              this._doAfterHandler({ context, req: reqParams, res, replyTo: req.replyTo })
+        _handler.call(context, reqParams, (err, data) => {
+          if (context.$closed === false) {
+            if (err) {
+              context.error(err)
+            } else {
+              context.write(data)
             }
           }
         })
@@ -179,45 +194,45 @@ class RouteContext {
     })
   }
 
-  _doAfterHandler ({ context, req, res, replyTo }) {
-    const { _chain, _log: log } = this
-    _chain.RunHook('onAfterHandler', { context, req, res, log }, (err) => {
-      if (this._checkNoError(err)) {
-        this._doResponse({ context, res, replyTo })
-      }
-    })
-  }
-
-  _doResponse ({ context, res, replyTo }) {
-    const { _transport, _chain, _log: log } = this
+  _doResponse ({ context, res, code }) {
+    const { $transport: nats, $chain, $log: log } = this.$instance
 
     const natsResponse = {
     }
-    _chain.RunHook('onResponse', { context, natsResponse, log }, (err) => {
-      if (this._checkNoError(err)) {
-        natsResponse.payload = res
-        _transport.publish(replyTo, natsResponse)
-      }
+
+    if (context.$channel) {
+      $chain.RunHook('onResponse', { context, natsResponse, log }, (err) => {
+        if (this._checkNoError(err)) {
+          natsResponse.res = res
+          natsResponse.code = code
+          nats.publish(context.$channel, natsResponse)
+        }
+      })
+    }
+  }
+
+  _doAfterHandler ({ context, req, res }) {
+    const { $chain, $log: log } = this.$instance
+    $chain.RunHook('onAfterHandler', { context, req, res, log }, (err) => {
+      this._checkNoError(err)
     })
   }
 
   _checkNoError (err) {
-    const { _chain, _log } = this
+    const { $chain, $log } = this.$instance
     const { url } = this.$options
 
-    const isNoErr = Util.checkNoError(_chain, err)
+    const isNoErr = Util.checkNoError($chain, err)
     if (!isNoErr) {
-      _log.error({ err, service: url })
+      $log.error({ err, service: url })
     }
     return isNoErr
   }
 }
 
 class InjectContext {
-  constructor ({ _transport, _chain, _log }) {
-    this._transport = _transport
-    this._chain = _chain
-    this._log = _log
+  constructor (instance) {
+    this.$instance = instance
   }
 
   get $options () {
@@ -271,12 +286,12 @@ class InjectContext {
       useDefaults: true
     })
 
-    const { _chain, _log: log } = this
+    const { $chain, $log: log } = this.$instance
 
     const payload = Object.assign({}, injectOptions)
     ajv.compile(defaultInjectOptionsSchema)(payload) //
 
-    _chain.RunHook('onBeforeInject', { context, options: injectOptions, log }, (err) => {
+    $chain.RunHook('onBeforeInject', { context, options: injectOptions, log }, (err) => {
       if (this._checkNoError(err)) {
         this._opts = injectOptions
         this._doInject({ context, payload })
@@ -285,9 +300,9 @@ class InjectContext {
   }
 
   _doInject ({ context, payload }) {
-    const { _chain, _log: log, _transport } = this
+    const { $chain, $log: log, $transport: nats } = this.$instance
 
-    _chain.RunHook('onInject', { context, natsRequest: payload, log }, (err) => {
+    $chain.RunHook('onInject', { context, natsRequest: payload, log }, (err) => {
       if (this._checkNoError(err)) {
         const url = payload.url; delete payload.url
         const pubsub = payload.$pubsub; delete payload.$pubsub
@@ -300,7 +315,7 @@ class InjectContext {
         }
 
         if (pubsub === true) {
-          _transport.publish(url, payload, (err) => {
+          nats.publish(url, payload, (err) => {
             context._excute(err)
             this._doAfterInject({ err, context })
           })
@@ -314,30 +329,41 @@ class InjectContext {
             reqOpts.max = expected || max
           }
 
-          context.close = () => {
-            _transport.unsubscribe(context.$channel)
+          if (reqOpts.max > 1) {
+            payload.$max = reqOpts.max
           }
 
-          context.$channel = _transport.request(url, payload, reqOpts, (reply) => {
-            if (reply.code && reply.code === NATS.REQ_TIMEOUT) {
-              this._checkNoError(reply)
-              context._excute(reply)
-              this._doAfterInject({ err: reply, context })
-            } else {
-              context._excute(null, reply.payload)
-              replys.items.push(reply)
+          context.close = () => {
+            nats.unsubscribe(context.$channel)
+          }
+
+          context.$channel = nats.request(url, payload, reqOpts, (reply) => {
+            if (reply.code) {
+              if (reply.code === 200) {
+                context._excute(null, reply.res)
+                replys.items.push(reply.res)
+              } else if (reply.code === 404) {
+                context._excute(Errio.parse(reply.res))
+                this._doAfterInject({ err: reply, context })
+                if (reqOpts.max > 1) {
+                  context.close()
+                }
+              } else if (reply.code === NATS.REQ_TIMEOUT) {
+                context._excute(reply)
+                this._doAfterInject({ err: reply, context })
+              }
             }
           })
 
           if (expected > 0) {
-            _transport.timeout(context.$channel, timeout, expected, () => {
+            nats.timeout(context.$channel, timeout, expected, () => {
               const err = new errors.BeanifyError(`Inject timeout:${url}`)
               context._excute(err)
               this._doAfterInject({ err, context })
             })
           }
 
-          _transport.onUnsubscribe(context.$channel, () => {
+          nats.onUnsubscribe(context.$channel, () => {
             this._doAfterInject({ replys, context })
           })
         }
@@ -346,19 +372,19 @@ class InjectContext {
   }
 
   _doAfterInject ({ err, context, replys }) {
-    const { _chain, _log: log } = this
+    const { $chain, $log: log } = this.$instance
     replys = replys || {}
-    _chain.RunHook('onAfterInject', { context, error: err, replys: replys.items, log }, (err) => {
+    $chain.RunHook('onAfterInject', { context, error: err, replys: replys.items, log }, (err) => {
       replys.items = []
       this._checkNoError(err)
     })
   }
 
   _checkNoError (err) {
-    const { _chain, _log } = this
-    const isNoErr = Util.checkNoError(_chain, err)
+    const { $chain, $log } = this.$instance
+    const isNoErr = Util.checkNoError($chain, err)
     if (!isNoErr) {
-      _log.error(err)
+      $log.error(err)
     }
     return isNoErr
   }
@@ -370,18 +396,13 @@ class Router {
     this._parent = beanify
     this._self = opts.main
 
-    const { $avvio, $chain, $transport, $log } = beanify
-
-    this._injectContext = new InjectContext({
-      _transport: $transport,
-      _chain: $chain,
-      _log: $log
-    })
+    this._injectContext = new InjectContext(beanify)
     // this._matcher = new Qlobber({
     //     separator: '.',
     //     wildcard_one: '*',
     //     wildcard_some: '>'
     // })
+    const { $avvio } = beanify
 
     this._routeQ = FastQ(this, (route, done) => {
       route.registerService((err, isOk) => {
@@ -424,7 +445,7 @@ class Router {
       return this._parent
     }
 
-    const { $transport, $avvio, $chain, $log } = this._parent
+    const { $avvio } = this._parent
     const ajv = new AJV({ useDefaults: true })
 
     opts = Object.assign({}, opts)
@@ -447,11 +468,7 @@ class Router {
       // url: opts.url,
       ...opts,
       _handler: onRequest
-    }, {
-      _transport: $transport,
-      _chain: $chain,
-      _log: $log
-    })
+    }, this._parent)
 
     // const matchs = this._matcher.match(opts.url);
     // this._matcher.add(opts.url, service);
@@ -481,50 +498,6 @@ class Router {
       return evaluateResult
     }
   }
-
-  // _sysOnInjectBuildInfo(context, done) {
-  //     const { _opts, _parent, log } = context;
-
-  //     const currentTime = Util.nowTime()
-
-  //     context.$context = _opts.$context || _parent.$context;
-  //     context.$delegate = _opts.$delegate || {}
-  //     context.$meta = Object.assign(context.$meta, _opts.$meta)
-
-  //     context.$trace = {
-  //         spanId: _parent.$trace.spanId || Util.generateRandomId(),
-  //         traceId: _parent.$trace.traceId || Util.generateRandomId(),
-  //         parentSpanId: _parent.$trace.spanId,
-  //         timestamp: currentTime,
-  //         service: _opts.url,
-  //     }
-
-  //     // detect recursion 递归检测
-  //     // 后续添加
-
-  //     if (log.level === 'trace') {
-  //         context.log = context.log.child({
-  //             parentSpanId: context.$trace.parentSpanId,
-  //             traceId: context.$trace.traceId,
-  //             spanId: context.$trace.spanId
-  //         })
-
-  //         context.log.trace({ service: _opts.url }, 'Request started')
-  //     } else {
-  //         context.log.info({ service: _opts.url }, 'Request started')
-  //     }
-
-  //     const payload={
-  //         body:Util.formatBody(_opts.body),
-  //         meta:context.$meta,
-  //         delegate:context.$delegate,
-  //         trace:context.$trace,
-  //     }
-
-  //     context._payload=payload
-
-  //     done()
-  // }
 }
 
 module.exports = beanifyPlugin((beanify, opts, done) => {

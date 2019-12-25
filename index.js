@@ -1,7 +1,6 @@
 const AVVIO = require('avvio')
 // const FastQ = require('fastq')
-const Pino = require('pino')
-const Errio = require('errio')
+// const Errio = require('errio')
 
 const beanifyPlugin = require('beanify-plugin')
 
@@ -14,9 +13,6 @@ class Beanify {
     this._self = this
     this._options = defaultOptions(options)
     this._current = null
-
-    this._setupErrors()
-    this._setupLogger()
 
     this._avvio = AVVIO(this, {
       expose: {
@@ -59,12 +55,6 @@ class Beanify {
       scopedInstance[sChildren] = []
       scopedInstance[beanifyPlugin.pluginPrefix] = pluginPrefix
 
-      if (meta && meta.name && beanify._options.log.useChild) {
-        scopedInstance._log = beanify._log.child({
-          plugin: meta.name
-        })
-      }
-
       // add hook
 
       scopedInstance.decorate = function decorate () {
@@ -88,10 +78,6 @@ class Beanify {
 
   get $avvio () {
     return this._avvio
-  }
-
-  get $log () {
-    return this._log
   }
 
   get $plugins () {
@@ -171,27 +157,20 @@ class Beanify {
     })
   }
 
-  _setupLogger () {
-    const opts = {
-      name: this._options.name,
-      prettyPrint: this._options.log.usePretty,
-      level: this._options.log.level
-    }
-
-    this._log = Pino(opts)
-  }
-
-  _setupErrors () {
-    Errio.setDefaults(this._options.errio)
-
-    for (const err in errors) {
-      Errio.register(errors[err])
-    }
-  }
-
   _registerPlugins () {
+    this.register(require('./plugins/beanify-logger'), {
+      ...this._options.pino,
+      name: this._options.name
+    })
+
+    this.register(require('./plugins/beanify-errio'), {
+      ...this._options.errio
+    })
+
     this.register(require('./plugins/beanify-chain'))
-    this.register(require('./plugins/beanify-nats'), this._options.nats)
+    this.register(require('./plugins/beanify-nats'), {
+      ...this._options.nats
+    })
     this.register(require('./plugins/beanify-router'), { main: this })
   }
 }

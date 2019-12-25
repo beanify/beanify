@@ -406,7 +406,7 @@ tap.test('beanify-chain test with onAfterHandler promise style', (t) => {
         b: 34
       }
     }, (err, res) => {
-      throw err
+      if (err) throw err
     })
 
     b.inject({
@@ -416,7 +416,7 @@ tap.test('beanify-chain test with onAfterHandler promise style', (t) => {
         b: 34
       }
     }, (err, res) => {
-      throw err
+      if (err) throw err
     })
 
     setTimeout(() => {

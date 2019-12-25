@@ -10,12 +10,6 @@ declare namespace Beanify {
 
     type LogLevel = 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace' | 'silent'
 
-    interface LogOptions {
-        usePretty?: boolean
-        level?: LogLevel,
-        useChild?: boolean
-    }
-
     interface ErrioOptions {
         recursives?: boolean,
         inherited?: boolean,
@@ -25,10 +19,21 @@ declare namespace Beanify {
         include?: Array<any>
     }
 
+    interface ErrioObject{
+        setDefaults(options:ErrioOptions):void
+        register(constructor:FunctionConstructor,options?:any):void
+        registerAll(constructors:Array<FunctionConstructor>,options?:any):void
+        registerObject(constructors:Function,options?:any):void
+        toObject(error:any,callOptions?:any):Object
+        fromObject(object:Object,callOptions?:any):Error
+        stringify(error,callOptions?:any):string
+        parse(string:String,callOptions?:any):Error
+    }
+
     interface Options {
         nats: NATS.ClientOpts
         name: string,
-        log?: LogOptions,
+        log?: PINO.LoggerOptions,
         errio?: ErrioOptions,
     }
 
@@ -168,9 +173,14 @@ declare class Beanify {
 
     $options: Beanify.Options
     $avvio: AVVIO.Avvio<Beanify>
-    $log: PINO.Logger
     $plugins: Array<string>
 
+    //beanify-errio
+    $errio:ErrioObject
+
+    //beanify-logger
+    $log: PINO.Logger
+    
     //beanify-nats
     $transport: Beanify.Transport
 
