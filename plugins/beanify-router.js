@@ -173,7 +173,6 @@ class RouteContext {
         if (context.$channel && context.$closed === false) {
           nats.publish(context.$channel, {
             res: data,
-            code: 200,
             $current: context.$current
           })
           repData.items.push(data)
@@ -190,8 +189,7 @@ class RouteContext {
     context.error = (err) => {
       if (context.$channel && context.$closed === false) {
         nats.publish(context.$channel, {
-          res: Errio.stringify(err),
-          code: 404
+          err: Errio.toObject(err),
         })
       }
 
@@ -227,7 +225,7 @@ class RouteContext {
     })
   }
 
-  _doResponse({ context, res, code }) {
+  _doResponse({ context, res }) {
     const { $transport: nats, $chain, $log: log } = this.$instance
 
     const natsResponse = {
@@ -237,7 +235,6 @@ class RouteContext {
       $chain.RunHook('onResponse', { context, natsResponse, log }, (err) => {
         if (this._checkNoError(err)) {
           natsResponse.res = res
-          natsResponse.code = 200
           nats.publish(context.$channel, natsResponse)
         }
       })
@@ -364,22 +361,37 @@ class InjectContext {
           }
 
           context.$channel = nats.request(url, payload, reqOpts, (reply) => {
-            if (reply.code) {
-              if (reply.code === 200) {
-                context.$current = reply.$current 
-                context._excute(null, reply.res)
-                replys.items.push(reply.res)
-              } else if (reply.code === 404) {
-                context._excute(Errio.parse(reply.res))
-                this._doAfterInject({ err: reply, context })
-                if (reqOpts.max > 1) {
-                  context.close()
-                }
-              } else if (reply.code === NATS.REQ_TIMEOUT) {
-                context._excute(reply)
-                this._doAfterInject({ err: reply, context })
+            if (reply.err) {
+              const err=Errio.fromObject(reply.err);
+              context._excute(err)
+              this._doAfterInject({ err, context })
+              if (reqOpts.max > 1) {
+                context.close()
               }
+            } else if (reply.res) {
+              context.$current = reply.$current
+              context._excute(null, reply.res)
+              replys.items.push(reply.res)
+            } else {
+              context._excute(reply)
+              this._doAfterInject({ err: reply, context })
             }
+            // if (reply.code) {
+            //   if (reply.code === 200) {
+            //     context.$current = reply.$current 
+            //     context._excute(null, reply.res)
+            //     replys.items.push(reply.res)
+            //   } else if (reply.code === 404) {
+            //     context._excute(Errio.parse(reply.res))
+            //     this._doAfterInject({ err: reply, context })
+            //     if (reqOpts.max > 1) {
+            //       context.close()
+            //     }
+            //   } else if (reply.code === NATS.REQ_TIMEOUT) {
+            //     context._excute(reply)
+            //     this._doAfterInject({ err: reply, context })
+            //   }
+            // }
           })
 
           if (expected > 0) {
