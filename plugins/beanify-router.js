@@ -152,7 +152,7 @@ class RouteContext {
   }
 
   _doHandler ({ context, natsRequest }) {
-    const { $chain, $log: log } = this.$instance
+    const { $chain, $log: log, $transport: nats } = this.$instance
     const { _handler } = this.$options
 
     const reqParams = {
@@ -160,36 +160,66 @@ class RouteContext {
       fromUrl: natsRequest.fromUrl
     }
 
+    const repData = {
+      items: []
+    }
+
     context.write = (data) => {
-      if (context.$current < context.$max &&
+      if (context.$max > 1 &&
+        context.$current < context.$max &&
         context.$closed === false) {
         context.$current++
-        this._doResponse({ context, code: 200, res: data })
+
+        if (context.$channel && context.$closed === false) {
+          nats.publish(context.$channel, {
+            res: data, code: 200
+          })
+          repData.items.push(data)
+        }
 
         if (context.$current >= context.$max) {
           context.$closed = true
-          this._doAfterHandler({ context, req: reqParams, res: data })
+          this._doAfterHandler({ context, req: reqParams, res: repData })
         }
       }
     }
 
     context.error = (err) => {
-      this._doResponse({ context, code: 404, res: Errio.stringify(err) })
+      if (context.$channel && context.$closed === false) {
+        nats.publish(context.$channel, {
+          res: Errio.stringify(err),
+          code: 404
+        })
+      }
+
       context.$closed = true
-      this._doAfterHandler({ context, req: reqParams, res: err })
     }
 
     $chain.RunHook('onHandler', { context, req: reqParams, log }, (err) => {
       if (this._checkNoError(err)) {
         _handler.call(context, reqParams, (err, data) => {
-          if (context.$closed === false) {
+          if (context.$closed === false && context.$max === 1) {
             if (err) {
               context.error(err)
             } else {
-              context.write(data)
+              this._doAfterHandler({ context, req: reqParams, res: data })
             }
           }
         })
+      }
+    })
+  }
+
+  _doAfterHandler ({ context, req, res }) {
+    const { $chain, $log: log } = this.$instance
+    $chain.RunHook('onAfterHandler', { context, req, res, log }, (err) => {
+      if (context.$max === 1) {
+        if (this._checkNoError(err)) {
+          this._doResponse({
+            context,
+            res
+          })
+        }
       }
     })
   }
@@ -204,18 +234,11 @@ class RouteContext {
       $chain.RunHook('onResponse', { context, natsResponse, log }, (err) => {
         if (this._checkNoError(err)) {
           natsResponse.res = res
-          natsResponse.code = code
+          natsResponse.code = 200
           nats.publish(context.$channel, natsResponse)
         }
       })
     }
-  }
-
-  _doAfterHandler ({ context, req, res }) {
-    const { $chain, $log: log } = this.$instance
-    $chain.RunHook('onAfterHandler', { context, req, res, log }, (err) => {
-      this._checkNoError(err)
-    })
   }
 
   _checkNoError (err) {
