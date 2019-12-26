@@ -4,7 +4,7 @@ import NATS from "nats"
 import AVVIO from "avvio"
 import PINO from "pino"
 import BeanifyPlugin from "beanify-plugin"
-import {EventEmitter} from "events"
+import { EventEmitter } from "events"
 
 declare namespace Beanify {
 
@@ -19,15 +19,15 @@ declare namespace Beanify {
         include?: Array<any>
     }
 
-    interface ErrioObject{
-        setDefaults(options:ErrioOptions):void
-        register(constructor:FunctionConstructor,options?:any):void
-        registerAll(constructors:Array<FunctionConstructor>,options?:any):void
-        registerObject(constructors:Function,options?:any):void
-        toObject(error:any,callOptions?:any):Object
-        fromObject(object:Object,callOptions?:any):Error
-        stringify(error,callOptions?:any):string
-        parse(string:String,callOptions?:any):Error
+    interface ErrioObject {
+        setDefaults(options: ErrioOptions): void
+        register(constructor: FunctionConstructor, options?: any): void
+        registerAll(constructors: Array<FunctionConstructor>, options?: any): void
+        registerObject(constructors: Function, options?: any): void
+        toObject(error: any, callOptions?: any): Object
+        fromObject(object: Object, callOptions?: any): Error
+        stringify(error, callOptions?: any): string
+        parse(string: String, callOptions?: any): Error
     }
 
     interface Options {
@@ -44,7 +44,7 @@ declare namespace Beanify {
         ): void
     }
 
-    interface Transport{
+    interface Transport {
         $options: NATS.ClientOpts,
         $connected: boolean,
         subscribe(topic: string, cb: Function): number
@@ -53,17 +53,17 @@ declare namespace Beanify {
         publish(topic: string, cb: Function): void
         publish(topic: string, msg: any, cb: Function): void
         publish(topic: string, msg: any, reply: string, cb: Function): void
-        
-        request(topic:string,cb:Function):number
-        request(topic:string,msg:any,cb:Function):number
-        request(topic:string,msg:any,options:NATS.SubscribeOptions,cb:Function):number
-        
-        timeout(sid: number, timeout: number, expected: number, cb: (sid: number) => void):void
+
+        request(topic: string, cb: Function): number
+        request(topic: string, msg: any, cb: Function): number
+        request(topic: string, msg: any, options: NATS.SubscribeOptions, cb: Function): number
+
+        timeout(sid: number, timeout: number, expected: number, cb: (sid: number) => void): void
 
         flush(cb?: Function): void
 
-        unsubscribe(sid:number):void
-        onUnsubscribe(sid:number,cb:Function):void
+        unsubscribe(sid: number): void
+        onUnsubscribe(sid: number, cb: Function): void
     }
 
 
@@ -176,11 +176,11 @@ declare class Beanify {
     $plugins: Array<string>
 
     //beanify-errio
-    $errio:ErrioObject
+    $errio: ErrioObject
 
     //beanify-logger
     $log: PINO.Logger
-    
+
     //beanify-nats
     $transport: Beanify.Transport
 
@@ -191,6 +191,7 @@ declare class Beanify {
 
     //beanify-router
     $router: Beanify.Router
+    $injectDomain: Beanify.RouterInject
     route: Beanify.RouterRoute
     inject: Beanify.RouterInject
 }

@@ -16,7 +16,8 @@ class Beanify {
 
     this._avvio = AVVIO(this, {
       expose: {
-        use: '_use'
+        use: '_use',
+        ready: '_ready'
       },
       autostart: true,
       timeout: 5000
@@ -108,6 +109,14 @@ class Beanify {
 
     pluginOpts = Object.assign({}, pluginOpts, opts)
     this._use(plugin, pluginOpts)
+    return this
+  }
+
+  ready (callback) {
+    const _readyCaller = (err) => {
+      callback.bind(this.$injectDomain)(err)
+    }
+    this._ready(_readyCaller)
     return this
   }
 

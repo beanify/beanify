@@ -1,12 +1,13 @@
 {
   "name": "beanify",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "micro-services nats nats-micro-services",
   "main": "index.js",
   "scripts": {
     "test": "standard && tap test/**/*.test.js ",
     "unit": "tap test/**/*.test.js --100 --cov --coverage-report=lcov",
-    "aaa": "tap test/**/beanify-router.test.js --100 --cov --coverage-report=text"
+    "aaa": "tap test/**/beanify-router.test.js --100 --cov --coverage-report=text",
+    "fix": "standard --fix"
   },
   "author": "beanjs",
   "license": "MIT",

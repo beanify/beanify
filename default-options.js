@@ -45,7 +45,7 @@ const defaultSchema = {
         },
         stack: {
           type: 'boolean',
-          default: true
+          default: false
         },
         private: {
           type: 'boolean',
