@@ -196,7 +196,7 @@ class RouteContext {
 
     $chain.RunHook('onHandler', { context, req: reqParams, log }, (err) => {
       if (this._checkNoError(err)) {
-        _handler.call(context, reqParams, (err, ...data) => {
+        _handler.call(context, reqParams, (err, data) => {
           if (context.$closed === false && context.$max === 1) {
             if (err) {
               context.error(err)
@@ -368,12 +368,13 @@ class InjectContext {
               }
             } else if (reply.res !== undefined) {
               context.$current = reply.$current
-              if (Array.isArray(reply.res)) {
-                reply.res.unshift(null)
-                context._excute.apply(context, reply.res)
-              } else {
-                context._excute(null, reply.res)
-              }
+              // if (Array.isArray(reply.res)) {
+              //   reply.res.unshift(null)
+              //   context._excute.apply(context, reply.res)
+              // } else {
+              //   context._excute(null, reply.res)
+              // }
+              context._excute(null, reply.res)
               replys.items.push(reply.res)
             } else {
               context._excute(reply)

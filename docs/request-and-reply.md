@@ -22,32 +22,6 @@ beanify.inject({
 
 ```
 
-## Multiple return
-
-```javascript
-beanify.route({
-    url:'math.add'
-  },
-  function({body},res) {
-    const res1=1;
-    const res2=2;
-    res(null,res1,res2)
-  }
-)
-
-beanify.inject({
-    url:'math.add',
-    body:{
-        a: 1,
-        b: 1,
-    },
-  },
-  function(err, res1,res2) {
-    //res1==1;res2==2
-  }
-)
-```
-
 ## Receive multiple messages
 This allows you to receive multiple messages (in this case 10). If you don't receive 10 messages the INBOX channel is still open and you have to close it manually.
 
