@@ -9,7 +9,7 @@ const Errio = require('errio')
 
 const errors = require('../errors')
 const Util = require('../util')
-const NATS = require('nats')
+// const NATS = require('nats')
 
 const defaultRouteOptionsSchema = {
   type: 'object',
@@ -168,8 +168,6 @@ class RouteContext {
       if (context.$max > 1 &&
         context.$current < context.$max &&
         context.$closed === false) {
-
-          
         if (context.$channel && context.$closed === false) {
           nats.publish(context.$channel, {
             res: data,
@@ -198,7 +196,7 @@ class RouteContext {
 
     $chain.RunHook('onHandler', { context, req: reqParams, log }, (err) => {
       if (this._checkNoError(err)) {
-        _handler.call(context, reqParams, (err, data) => {
+        _handler.call(context, reqParams, (err, ...data) => {
           if (context.$closed === false && context.$max === 1) {
             if (err) {
               context.error(err)
@@ -361,16 +359,21 @@ class InjectContext {
           }
 
           context.$channel = nats.request(url, payload, reqOpts, (reply) => {
-            if (reply.err) {
+            if (reply.err !== undefined) {
               const err = Errio.fromObject(reply.err)
               context._excute(err)
               this._doAfterInject({ err, context })
               if (reqOpts.max > 1) {
                 context.close()
               }
-            } else if (reply.res) {
+            } else if (reply.res !== undefined) {
               context.$current = reply.$current
-              context._excute(null, reply.res)
+              if (Array.isArray(reply.res)) {
+                reply.res.unshift(null)
+                context._excute.apply(context, reply.res)
+              } else {
+                context._excute(null, reply.res)
+              }
               replys.items.push(reply.res)
             } else {
               context._excute(reply)
