@@ -201,7 +201,7 @@ class RouteContext {
             if (err) {
               context.error(err)
             } else {
-              this._doAfterHandler({ context, req: reqParams, res: data })
+              this._doAfterHandler({ context, req: reqParams, res: data || null })
             }
           }
         })
