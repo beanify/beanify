@@ -156,7 +156,6 @@ declare class Beanify {
         opts?: object
     ): Beanify
 
-    ready(): Promise<Beanify>
     ready(cb: (err: Error) => void): void
     ready(cb: (err: Error, done: Function) => void): void
     ready(cb: (err: Error, context: Beanify, done: Function) => void): void

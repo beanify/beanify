@@ -9,7 +9,7 @@ const Errio = require('errio')
 
 const errors = require('../errors')
 const Util = require('../util')
-// const NATS = require('nats')
+const NATS = require('nats')
 
 const defaultRouteOptionsSchema = {
   type: 'object',
@@ -366,7 +366,10 @@ class InjectContext {
               if (reqOpts.max > 1) {
                 context.close()
               }
-            } else if (reply.res !== undefined) {
+            }else if(reply.code === NATS.REQ_TIMEOUT){
+              context._excute(reply)
+              this._doAfterInject({ err: reply, context })
+            } else{
               context.$current = reply.$current
               // if (Array.isArray(reply.res)) {
               //   reply.res.unshift(null)
@@ -376,9 +379,6 @@ class InjectContext {
               // }
               context._excute(null, reply.res)
               replys.items.push(reply.res)
-            } else {
-              context._excute(reply)
-              this._doAfterInject({ err: reply, context })
             }
             // if (reply.code) {
             //   if (reply.code === 200) {
@@ -483,8 +483,8 @@ class Router {
   // }
 
   route (opts, onRequest) {
-    const currentInstance = this._self._current
-    if (!currentInstance || typeof onRequest !== 'function') {
+    
+    if (typeof onRequest !== 'function') {
       return this._parent
     }
 
@@ -502,9 +502,12 @@ class Router {
       return this._parent
     }
 
-    const prefix = currentInstance[beanifyPlugin.pluginPrefix]
-    if (prefix !== '') {
-      opts.url = `${prefix}.${opts.url}`
+    const currentInstance = this._self._current
+    if(currentInstance){
+      const prefix = currentInstance[beanifyPlugin.pluginPrefix]
+      if (prefix !== '') {
+        opts.url = `${prefix}.${opts.url}`
+      }
     }
 
     const service = new RouteContext({
