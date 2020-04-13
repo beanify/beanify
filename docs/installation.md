@@ -12,6 +12,7 @@ npm i beanify
 * name:beanify ​cluster name
 * [errio](https://github.com/programble/errio#options):errio Options 
 * [pino](https://github.com/pinojs/pino):pino Options (__level__:default __warn__[set by beanify])
+* prefix:global prefix (use for debug mode)
 
 ## usage
 
@@ -26,6 +27,7 @@ const beanify = new Beanify({
   pino:{
       level:'warn'
   }
+  //prefix:'aaa'
 })
 
 beanify.register(beanifyPlugin((beanify,opts,done)=>{

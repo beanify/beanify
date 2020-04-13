@@ -19,7 +19,7 @@ tap.test('defaultOptions test', (t) => {
     errio: {
       recursive: true,
       inherited: true,
-      stack: true,
+      stack: false,
       private: false,
       exclude: [],
       include: []

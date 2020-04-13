@@ -272,6 +272,12 @@ class InjectContext {
       err.message = `injectOptions ${err.message}`
     }
 
+    const globalPrefix = this.$instance.$options.prefix
+
+    if (globalPrefix) {
+      opts.url = `${globalPrefix}.${opts.url}`
+    }
+
     const context = Object.create(this)
     context._parent = this
     context._excute = null
@@ -366,10 +372,10 @@ class InjectContext {
               if (reqOpts.max > 1) {
                 context.close()
               }
-            }else if(reply.code === NATS.REQ_TIMEOUT){
+            } else if (reply.code === NATS.REQ_TIMEOUT) {
               context._excute(reply)
               this._doAfterInject({ err: reply, context })
-            } else{
+            } else {
               context.$current = reply.$current
               // if (Array.isArray(reply.res)) {
               //   reply.res.unshift(null)
@@ -483,12 +489,11 @@ class Router {
   // }
 
   route (opts, onRequest) {
-    
     if (typeof onRequest !== 'function') {
       return this._parent
     }
 
-    const { $avvio } = this._parent
+    const { $avvio, $options } = this._parent
     const ajv = new AJV({ useDefaults: true })
 
     opts = Object.assign({}, opts)
@@ -503,13 +508,18 @@ class Router {
     }
 
     const currentInstance = this._self._current
-    if(currentInstance){
+    if (currentInstance) {
       const prefix = currentInstance[beanifyPlugin.pluginPrefix]
       if (prefix !== '') {
         opts.url = `${prefix}.${opts.url}`
       }
     }
 
+    const globalPrefix = $options.prefix
+
+    if (globalPrefix) {
+      opts.url = `${globalPrefix}.${opts.url}`
+    }
     const service = new RouteContext({
       // url: opts.url,
       ...opts,
