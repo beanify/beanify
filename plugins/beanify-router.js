@@ -528,9 +528,9 @@ class Router {
         opts.url = `${dev.prefix}.${opts.url}`
       }
     }
-    console.log({
-      opts
-    })
+    // console.log({
+    //   opts
+    // })
     const service = new RouteContext({
       // url: opts.url,
       ...opts,
