@@ -35,6 +35,10 @@ declare namespace Beanify {
         name: string,
         log?: PINO.LoggerOptions,
         errio?: ErrioOptions,
+        dev: {
+            mode?: boolean,
+            prefix?: string
+        }
     }
 
     interface DoneCallback {

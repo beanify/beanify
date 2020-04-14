@@ -8,11 +8,12 @@ npm i beanify
 
 ## Options
 
-* [nats](https://github.com/nats-io/nats.js#connect-options):config NATS Client Options (__json__:default __true__ [set by beanify])
 * name:beanify ​cluster name
+* dev:```{mode:boolean,prefix:string}```
+* [nats](https://github.com/nats-io/nats.js#connect-options):config NATS Client Options (__json__:default __true__ [set by beanify])
 * [errio](https://github.com/programble/errio#options):errio Options 
 * [pino](https://github.com/pinojs/pino):pino Options (__level__:default __warn__[set by beanify])
-* prefix:global prefix (use for debug mode)
+
 
 ## usage
 

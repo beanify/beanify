@@ -66,17 +66,17 @@ const defaultInjectOptionsSchema = {
 }
 
 class RouteContext {
-  constructor (opts, instance) {
+  constructor(opts, instance) {
     this._opts = opts
     this._sid = -1
     this.$instance = instance
   }
 
-  get $options () {
+  get $options() {
     return this._opts
   }
 
-  registerService (done) {
+  registerService(done) {
     const { $transport: nats, $chain, $log } = this.$instance
 
     $chain.RunHook('onRoute', { route: this, log: $log }, (err) => {
@@ -123,7 +123,7 @@ class RouteContext {
     })
   }
 
-  _doRequest (natsRequest, natsReplyTo, topicUrl) {
+  _doRequest(natsRequest, natsReplyTo, topicUrl) {
     const { $chain, $log: log } = this.$instance
 
     natsRequest.fromUrl = topicUrl
@@ -141,7 +141,7 @@ class RouteContext {
     })
   }
 
-  _doBeforeHandler ({ natsRequest, context }) {
+  _doBeforeHandler({ natsRequest, context }) {
     const { $chain, $log: log } = this.$instance
 
     $chain.RunHook('onBeforeHandler', { context, natsRequest, log }, (err) => {
@@ -151,7 +151,7 @@ class RouteContext {
     })
   }
 
-  _doHandler ({ context, natsRequest }) {
+  _doHandler({ context, natsRequest }) {
     const { $chain, $log: log, $transport: nats } = this.$instance
     const { _handler } = this.$options
 
@@ -209,7 +209,7 @@ class RouteContext {
     })
   }
 
-  _doAfterHandler ({ context, req, res }) {
+  _doAfterHandler({ context, req, res }) {
     const { $chain, $log: log } = this.$instance
     $chain.RunHook('onAfterHandler', { context, req, res, log }, (err) => {
       if (context.$max === 1) {
@@ -223,7 +223,7 @@ class RouteContext {
     })
   }
 
-  _doResponse ({ context, res }) {
+  _doResponse({ context, res }) {
     const { $transport: nats, $chain, $log: log } = this.$instance
 
     const natsResponse = {
@@ -239,7 +239,7 @@ class RouteContext {
     }
   }
 
-  _checkNoError (err) {
+  _checkNoError(err) {
     const { $chain, $log } = this.$instance
     const { url } = this.$options
 
@@ -252,15 +252,15 @@ class RouteContext {
 }
 
 class InjectContext {
-  constructor (instance) {
+  constructor(instance) {
     this.$instance = instance
   }
 
-  get $options () {
+  get $options() {
     return this._opts
   }
 
-  inject (opts, onResponsed) {
+  inject(opts, onResponsed) {
     const ajv = new AJV({ useDefaults: true })
 
     opts = Object.assign({}, opts)
@@ -272,10 +272,12 @@ class InjectContext {
       err.message = `injectOptions ${err.message}`
     }
 
-    const globalPrefix = this.$instance.$options.prefix
+    const { dev } = this.$instance.$options
 
-    if (globalPrefix) {
-      opts.url = `${globalPrefix}.${opts.url}`
+    if (dev.mode == true) {
+      if (typeof dev.prefix === 'string') {
+        opts.url = `${dev.prefix}.${opts.url}`
+      }
     }
 
     const context = Object.create(this)
@@ -307,7 +309,7 @@ class InjectContext {
     return result
   }
 
-  _doBeforeInject ({ injectOptions, context }) {
+  _doBeforeInject({ injectOptions, context }) {
     const ajv = new AJV({
       removeAdditional: 'all',
       useDefaults: true
@@ -326,7 +328,7 @@ class InjectContext {
     })
   }
 
-  _doInject ({ context, payload }) {
+  _doInject({ context, payload }) {
     const { $chain, $log: log, $transport: nats } = this.$instance
 
     $chain.RunHook('onInject', { context, natsRequest: payload, log }, (err) => {
@@ -420,7 +422,7 @@ class InjectContext {
     })
   }
 
-  _doAfterInject ({ err, context, replys }) {
+  _doAfterInject({ err, context, replys }) {
     const { $chain, $log: log } = this.$instance
     replys = replys || {}
     $chain.RunHook('onAfterInject', { context, error: err, replys: replys.items, log }, (err) => {
@@ -429,7 +431,7 @@ class InjectContext {
     })
   }
 
-  _checkNoError (err) {
+  _checkNoError(err) {
     const { $chain, $log } = this.$instance
     const isNoErr = Util.checkNoError($chain, err)
     if (!isNoErr) {
@@ -440,7 +442,7 @@ class InjectContext {
 }
 
 class Router {
-  constructor ({ beanify, opts, done }) {
+  constructor({ beanify, opts, done }) {
     this._opts = Object.assign({}, opts)
     this._parent = beanify
     this._self = opts.main
@@ -488,12 +490,18 @@ class Router {
   //     return this._matcher;
   // }
 
-  route (opts, onRequest) {
+  route(opts, onRequest) {
     if (typeof onRequest !== 'function') {
       return this._parent
     }
 
     const { $avvio, $options } = this._parent
+    const { dev } = $options
+
+    if (opts.dev == true && dev.mode == false) {
+      return this._parent
+    }
+
     const ajv = new AJV({ useDefaults: true })
 
     opts = Object.assign({}, opts)
@@ -515,11 +523,14 @@ class Router {
       }
     }
 
-    const globalPrefix = $options.prefix
-
-    if (globalPrefix) {
-      opts.url = `${globalPrefix}.${opts.url}`
+    if (dev.mode == true) {
+      if (typeof dev.prefix === 'string') {
+        opts.url = `${dev.prefix}.${opts.url}`
+      }
     }
+    console.log({
+      opts
+    })
     const service = new RouteContext({
       // url: opts.url,
       ...opts,
@@ -536,7 +547,7 @@ class Router {
     return this._parent
   }
 
-  inject (opts, onResponsed) {
+  inject(opts, onResponsed) {
     if (onResponsed) {
       this._injectQ.push({ opts, onResponsed })
       return this._parent

@@ -61,6 +61,18 @@ const defaultSchema = {
         }
       },
       default: {}
+    },
+    dev: {
+      type: 'object',
+      properties: {
+        mode: {
+          type: 'boolean',
+          default: true
+        },
+        prefix: {
+          type: 'string'
+        }
+      }
     }
   }
 }
