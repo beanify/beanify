@@ -219,7 +219,7 @@ class RouteContext {
           res.then((data) => {
             done(null, data)
           }).catch((e) => {
-            done(e)
+            done(new errors.BeanifyError(e.message))
           })
         }
 
