@@ -196,7 +196,14 @@ class RouteContext {
 
     $chain.RunHook('onHandler', { context, req: reqParams, log }, (err) => {
       if (this._checkNoError(err)) {
-        _handler.call(context, reqParams, (err, data) => {
+        let completed = false;
+        const done = (err, data) => {
+          if (completed == true) {
+            return
+          }
+
+          completed = true
+
           if (context.$closed === false && context.$max === 1) {
             if (err) {
               context.error(err)
@@ -204,7 +211,33 @@ class RouteContext {
               this._doAfterHandler({ context, req: reqParams, res: data || null })
             }
           }
-        })
+        }
+
+        const res = _handler.call(context, reqParams, done)
+
+        if (res && res.then && typeof res.then == "function") {
+          res.then((data) => {
+            done(null, data)
+          }).catch((e) => {
+            done(e)
+          })
+        }
+
+        // console.log('res',res)  
+
+        // console.log('_hancler',_handler.then)
+        // if(_handler.then&&typeof _handler.then === "function"){
+        //   console.log('_handler is promise')
+        // }
+        // _handler.call(context, reqParams, (err, data) => {
+        //   if (context.$closed === false && context.$max === 1) {
+        //     if (err) {
+        //       context.error(err)
+        //     } else {
+        //       this._doAfterHandler({ context, req: reqParams, res: data || null })
+        //     }
+        //   }
+        // })
       }
     })
   }
@@ -491,9 +524,14 @@ class Router {
   // }
 
   route(opts, onRequest) {
+
+    // console.log(onRequest)
+
     if (typeof onRequest !== 'function') {
       return this._parent
     }
+
+    // console.log('asdasdasdasdasda')
 
     const { $avvio, $options } = this._parent
     const { dev } = $options
