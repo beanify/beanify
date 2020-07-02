@@ -28,7 +28,7 @@ module.exports = (beanify, opts, done) => {
     return
   }
 
-  if(opts.enable==false){
+  if (opts.enable == false) {
     beanify.$log.info('skipping the generate api docs')
     done()
     return
@@ -65,21 +65,22 @@ module.exports = (beanify, opts, done) => {
   fs.writeFileSync(readMeFilePath, `# 接口文档 \r\n\r\n`)
 
   beanify.addHook('onRoute', (route) => {
-    const docs = route.docs || { name: '未知接口', desc: '' }
-    const schema = route.schema || { }
+    const docs = route.docs || {}
+    const schema = route.schema || {}
     const pubsub = route.$pubsub
     const timeout = route.$timeout
     const url = route.url
 
     const filePath = path.join(docsDir, `${url}.md`)
     const relativePath = filePath.replace(docsDir, '.')
+    docs.name=docs.name||'未知接口'
 
     if (fs.existsSync(filePath)) {
       throw new Error(`${filePath} Already exists`)
     }
 
-    fs.writeFileSync(filePath, `# ${docs.name} \r\n\r\n`)
-    fs.appendFileSync(filePath, `${docs.description || docs.desc} \r\n\r\n`)
+    fs.writeFileSync(filePath, `# ${docs.name || url} \r\n\r\n`)
+    fs.appendFileSync(filePath, `${docs.description || docs.desc || ''} \r\n\r\n`)
 
 
     fs.appendFileSync(filePath, `## 基本 \r\n\r\n`)
@@ -90,15 +91,15 @@ module.exports = (beanify, opts, done) => {
 
     fs.appendFileSync(filePath, `## 参数[body] \r\n\r\n`)
     fs.appendFileSync(filePath, '```json\r\n')
-    fs.appendFileSync(filePath, JSON.stringify(schema.body, null, '\t'))
+    fs.appendFileSync(filePath, schema.body?JSON.stringify(schema.body, null, '\t'):'')
     fs.appendFileSync(filePath, '\r\n```\r\n\r\n')
 
     fs.appendFileSync(filePath, `## 返回[response] \r\n\r\n`)
     fs.appendFileSync(filePath, '```json\r\n')
-    fs.appendFileSync(filePath, JSON.stringify(schema.response, null, '\t'))
+    fs.appendFileSync(filePath, schema.response?JSON.stringify(schema.response, null, '\t'):'')
     fs.appendFileSync(filePath, '\r\n```\r\n\r\n')
 
-    fs.appendFileSync(readMeFilePath,`* [${docs.name}](${relativePath})\r\n`)
+    fs.appendFileSync(readMeFilePath, `* [${docs.name}](${relativePath})\r\n`)
 
   })
 
