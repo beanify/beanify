@@ -9,9 +9,10 @@ npm i beanify
 ## Options
 
 * [nats](https://github.com/nats-io/nats.js#connect-options):config NATS Client Options (__json__:default __true__ [set by beanify])
-* name:beanify ​cluster name
 * [errio](https://github.com/programble/errio#options):errio Options 
 * [pino](https://github.com/pinojs/pino):pino Options (__level__:default __warn__[set by beanify])
+* router:{**prefix**:string}
+* docs:{**dir**:string,**enable**:boolean}
 
 ## usage
 
@@ -22,7 +23,6 @@ const beanifyPlugin=require("beanify-plugin")
 
 const beanify = new Beanify({
   nats:{},
-  name:"is test",
   pino:{
       level:'warn'
   }
