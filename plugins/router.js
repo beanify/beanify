@@ -73,6 +73,8 @@ module.exports = (instance, opts, done) => {
   }
 
   const _injectQ = FastQ(instance, function (inject, next) {
+    const beginTime=Date.now()
+    this.$log.info(`begin inject(${beginTime}):${inject.url}`)
     onBeforeInjectCaller(inject)
       .then(async () => {
         await onInjectCaller(inject)
@@ -101,7 +103,9 @@ module.exports = (instance, opts, done) => {
         }
 
         await onAfterInjectCaller(inject)
-
+        const endTime=Date.now()
+        this.$log.info(`finished inject(${endTime}):${inject.url}`)
+        this.$log.info(`duration inject(${((endTime-beginTime)/1000)}ms):${inject.url}`)
         next()
       }).catch((err) => {
         onErrorHookCaller(err, inject.onError, () => { })
@@ -258,7 +262,7 @@ module.exports = (instance, opts, done) => {
 
     const { $nats } = instance
     const request = Object.create(route)
-
+    const beginTime=Date.now()
 
     request.$req = {
       ...req,
@@ -277,10 +281,15 @@ module.exports = (instance, opts, done) => {
       }
     }
     const natsResponse=(payload)=>{
+      const endTime=Date.now()
+      instance.$log.info(`request completed(${endTime}):${request.$req.fromUrl}`)
+      instance.$log.info(`request duration(${(endTime-beginTime)/1000}ms):${request.$req.fromUrl}`)
       if (request.$pubsub == false && request.$replyTo != '') {
         $nats.publish(request.$replyTo, payload)
       }
     }
+
+    instance.$log.info(`request incomming(${beginTime}):${request.$req.fromUrl}`)
 
     onBeforeHandlerCaller(request)
       .then(async () => {
