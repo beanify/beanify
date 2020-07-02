@@ -1,8 +1,7 @@
-const beanifyPlugin = require('beanify-plugin')
 const Errio = require('errio')
 const errors = require('../errors')
 
-module.exports = beanifyPlugin((beanify, opts, done) => {
+module.exports = (beanify, opts, done) => {
   Errio.setDefaults(opts)
 
   for (const err in errors) {
@@ -12,7 +11,4 @@ module.exports = beanifyPlugin((beanify, opts, done) => {
   beanify.decorate('$errio', Errio)
 
   done()
-}, {
-  name: 'beanify-errio',
-  scoped: false
-})
+}
