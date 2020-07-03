@@ -22,7 +22,7 @@ module.exports = (instance, opts, done) => {
   }
 
   const _routeQ = FastQ(instance, function (route, next) {
-    onRouteCaller(route)
+    onHookCaller('onRoute',route)
       .then(() => {
         const {
           $pubsub,
@@ -75,9 +75,9 @@ module.exports = (instance, opts, done) => {
   const _injectQ = FastQ(instance, function (inject, next) {
     const beginTime=Date.now()
     this.$log.info(`begin inject(${beginTime}):${inject.url}`)
-    onBeforeInjectCaller(inject)
+    onHookCaller('onBeforeInject',inject)
       .then(async () => {
-        await onInjectCaller(inject)
+        await onHookCaller('onInject',inject)
 
         const {
           url,
@@ -102,7 +102,7 @@ module.exports = (instance, opts, done) => {
           inject.$res=_result
         }
 
-        await onAfterInjectCaller(inject)
+        await onHookCaller('onAfterInject',inject)
         const endTime=Date.now()
         this.$log.info(`finished inject(${endTime}):${inject.url}`)
         this.$log.info(`duration inject(${((endTime-beginTime)/1000)}ms):${inject.url}`)
@@ -241,11 +241,11 @@ module.exports = (instance, opts, done) => {
     return this
   }
 
-  function onRouteCaller(route) {
+  function onHookCaller(hookName,instance){
     return new Promise((resolve, reject) => {
-      hooks = [...globalHooks['onRoute']]
-      if (typeof route.onRoute === 'function') {
-        hooks.push(route.onRoute)
+      hooks = [...globalHooks[hookName]]
+      if (typeof instance[hookName] === 'function') {
+        hooks.push(instance[hookName])
       }
 
       runHooksCaller(hooks, (err) => {
@@ -254,7 +254,7 @@ module.exports = (instance, opts, done) => {
         } else {
           resolve()
         }
-      }, route)
+      }, instance)
     })
   }
 
@@ -291,9 +291,9 @@ module.exports = (instance, opts, done) => {
 
     instance.$log.info(`request incomming(${beginTime}):${request.$req.fromUrl}`)
 
-    onBeforeHandlerCaller(request)
+    onHookCaller('onBeforeHandler',request)
       .then(async () => {
-        await onHandlerCaller(request)
+        await onHookCaller('onHandler',request)
 
         let sent=false
         const _sentCallback = (err, res) => {
@@ -311,7 +311,7 @@ module.exports = (instance, opts, done) => {
             res
           }
 
-          onAfterHandlerCaller(request)
+          onHookCaller('onAfterHandler',request)
             .then(()=>{
               natsResponse(request.$res)
             })
@@ -355,108 +355,6 @@ module.exports = (instance, opts, done) => {
 
     instance.$log.error(err)
     runHooksCaller(hooks, done, err)
-  }
-
-  function onBeforeInjectCaller(inject) {
-    return new Promise((resolve, reject) => {
-      const hooks = [...globalHooks['onBeforeInject']]
-      if (typeof inject.onBeforeInject === 'function') {
-        hooks.push(inject.onBeforeInject)
-      }
-
-      runHooksCaller(hooks, (err) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve()
-        }
-      }, inject)
-    })
-  }
-
-  function onInjectCaller(inject) {
-    return new Promise((resolve, reject) => {
-      const hooks = [...globalHooks['onInject']]
-      if (typeof inject.onInject === 'function') {
-        hooks.push(inject.onInject)
-      }
-
-      runHooksCaller(hooks, (err) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve()
-        }
-      }, inject)
-    })
-  }
-
-  function onAfterInjectCaller(inject) {
-    return new Promise((resolve, reject) => {
-      const hooks = [...globalHooks['onAfterInject']]
-      if (typeof inject.onAfterInject === 'function') {
-        hooks.push(inject.onAfterInject)
-      }
-
-      runHooksCaller(hooks, (err) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve()
-        }
-      }, inject)
-    })
-  }
-
-  function onBeforeHandlerCaller(request) {
-    return new Promise((resolve, reject) => {
-      const hooks = [...globalHooks['onBeforeHandler']]
-      if (typeof request.onBeforeHandler === 'function') {
-        hooks.push(request.onBeforeHandler)
-      }
-
-      runHooksCaller(hooks, (err) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve()
-        }
-      }, request)
-    })
-  }
-
-  function onHandlerCaller(request) {
-    return new Promise((resolve, reject) => {
-      const hooks = [...globalHooks['onHandler']]
-      if (typeof request.onHandler === 'function') {
-        hooks.push(request.onHandler)
-      }
-
-      runHooksCaller(hooks, (err) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve()
-        }
-      }, request)
-    })
-  }
-
-  function onAfterHandlerCaller(request){
-    return new Promise((resolve, reject) => {
-      const hooks = [...globalHooks['onAfterHandler']]
-      if (typeof request.onAfterHandler === 'function') {
-        hooks.push(request.onAfterHandler)
-      }
-
-      runHooksCaller(hooks, (err) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve()
-        }
-      }, request)
-    })
   }
 
   function runHooksCaller(hooks, callback, ...args) {

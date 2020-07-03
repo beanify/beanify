@@ -30,13 +30,7 @@ Beanify is an improvement from [Hemera](https://github.com/hemerajs/hemera). Fir
 * [beanify-plugin](https://github.com/beanjs-framework/beanify-plugin)
 * [beanify-env](https://github.com/beanjs-framework/beanify-env)
 * [beanify-url](https://github.com/beanjs-framework/beanify-url)
-* [beanify-cros](https://github.com/beanjs-framework/beanify-cros)
-* [beanify-ajv](https://github.com/beanjs-framework/beanify-ajv)
 * [beanify-autoload](https://github.com/beanjs-framework/beanify-autoload)
-* [beanify-env-options](https://github.com/beanjs-framework/beanify-env-options)
-
-
-
 
 
 ## Professional services
