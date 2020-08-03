@@ -5,13 +5,10 @@ const beanifyPlugin = require('beanify-plugin')
 const tap = require('tap')
 
 tap.test('beanify.register $plugins test', (t) => {
-  t.plan(3)
+  t.plan(2)
 
   const b = new Beanify({
-    nats: helper.nats,
-    log: {
-      useChild: true
-    }
+    nats: helper.nats
   })
 
   b.register(beanifyPlugin((beanify, opts, done) => {
@@ -24,8 +21,7 @@ tap.test('beanify.register $plugins test', (t) => {
     name: 'plugin2'
   })).ready((err) => {
     t.error(err)
-    t.strictSame(b.$plugins, ['beanify-chain', 'beanify-nats', 'beanify-router', 'plugin1', 'plugin2'], 'check loaded plugins')
-    t.equal(b.$options.log.useChild, true, 'check $options.log.useChild')
+    t.strictSame(b.$plugins, ['beanify-logger', 'beanify-errio', 'beanify-chain', 'beanify-nats', 'beanify-router', 'plugin1', 'plugin2'], 'check loaded plugins')
     b.close()
   })
 })
@@ -34,10 +30,7 @@ tap.test('beanify.register options test', (t) => {
   t.plan(3)
 
   const b = new Beanify({
-    nats: helper.nats,
-    log: {
-      useChild: true
-    }
+    nats: helper.nats
   })
 
   b.register(beanifyPlugin((beanify, opts, done) => {
@@ -62,9 +55,6 @@ tap.test('beanify.register prefix test', (t) => {
   t.plan(1)
 
   const b = new Beanify({
-    log: {
-      useChild: true
-    },
     nats: helper.nats
   })
 
@@ -88,9 +78,6 @@ tap.test('beanify.register beanify-plugin scope test', (t) => {
   t.plan(1)
 
   const b = new Beanify({
-    log: {
-      useChild: true
-    },
     nats: helper.nats
   })
 
@@ -111,9 +98,6 @@ tap.test('beanify.register dependencies test', (t) => {
   t.plan(1)
 
   const b = new Beanify({
-    log: {
-      useChild: true
-    },
     nats: helper.nats
   })
 
@@ -136,9 +120,6 @@ tap.test('beanify.register decorators test', (t) => {
   t.plan(1)
 
   const b = new Beanify({
-    log: {
-      useChild: true
-    },
     nats: helper.nats
   })
 
@@ -159,9 +140,6 @@ tap.test('beanify.register dependencies test with "dependencies not array" error
   t.plan(1)
 
   const b = new Beanify({
-    log: {
-      useChild: true
-    },
     nats: helper.nats
   })
 
@@ -184,9 +162,6 @@ tap.test('beanify.register dependencies test with "dependency not registered" er
   t.plan(1)
 
   const b = new Beanify({
-    log: {
-      useChild: true
-    },
     nats: helper.nats
   })
 
@@ -209,9 +184,6 @@ tap.test('beanify.register decorators test with "decorators not array" error', (
   t.plan(1)
 
   const b = new Beanify({
-    log: {
-      useChild: true
-    },
     nats: helper.nats
   })
 
@@ -231,9 +203,6 @@ tap.test('beanify.register decorators test with "decorator not registered" error
   t.plan(1)
 
   const b = new Beanify({
-    log: {
-      useChild: true
-    },
     nats: helper.nats
   })
 

@@ -4,17 +4,12 @@ import NATS from "nats"
 import AVVIO from "avvio"
 import PINO from "pino"
 import BeanifyPlugin from "beanify-plugin"
-import {EventEmitter} from "events"
+import AJV from 'ajv'
+import { EventEmitter } from "events"
 
 declare namespace Beanify {
 
     type LogLevel = 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace' | 'silent'
-
-    interface LogOptions {
-        usePretty?: boolean
-        level?: LogLevel,
-        useChild?: boolean
-    }
 
     interface ErrioOptions {
         recursives?: boolean,
@@ -25,11 +20,23 @@ declare namespace Beanify {
         include?: Array<any>
     }
 
+    interface ErrioObject {
+        setDefaults(options: ErrioOptions): void
+        register(constructor: FunctionConstructor, options?: any): void
+        registerAll(constructors: Array<FunctionConstructor>, options?: any): void
+        registerObject(constructors: Function, options?: any): void
+        toObject(error: any, callOptions?: any): Object
+        fromObject(object: Object, callOptions?: any): Error
+        stringify(error, callOptions?: any): string
+        parse(string: String, callOptions?: any): Error
+    }
+
     interface Options {
         nats: NATS.ClientOpts
-        name: string,
-        log?: LogOptions,
+        log?: PINO.LoggerOptions,
         errio?: ErrioOptions,
+        router?: { prefix?: string }
+        docs?: { dir?: string ,enable?:boolean}
     }
 
     interface DoneCallback {
@@ -39,101 +46,15 @@ declare namespace Beanify {
         ): void
     }
 
-    interface Transport{
-        $options: NATS.ClientOpts,
-        $connected: boolean,
-        subscribe(topic: string, cb: Function): number
-        subscribe(topic: string, opts: NATS.SubscribeOptions, cb: Function): number
-
-        publish(topic: string, cb: Function): void
-        publish(topic: string, msg: any, cb: Function): void
-        publish(topic: string, msg: any, reply: string, cb: Function): void
-        
-        request(topic:string,cb:Function):number
-        request(topic:string,msg:any,cb:Function):number
-        request(topic:string,msg:any,options:NATS.SubscribeOptions,cb:Function):number
-        
-        timeout(sid: number, timeout: number, expected: number, cb: (sid: number) => void):void
-
-        flush(cb?: Function): void
-
-        unsubscribe(sid:number):void
-        onUnsubscribe(sid:number,cb:Function):void
-    }
-
-
-    type ProcessChainType = 'onClose'
+    type HookType = 'onClose'
         | 'onRoute'
         | 'onBeforeInject'
         | 'onInject'
         | 'onAfterInject'
-        | 'onRequest'
         | 'onBeforeHandler'
         | 'onHandler'
-        | 'onResponse'
         | 'onAfterHandler'
         | 'onError'
-
-    interface ProcessChainAddHook {
-        (
-            type: ProcessChainType,
-            handler: Function
-        ): void
-    }
-
-    interface ProcessChainRunHook {
-        (
-            type: ProcessChainType,
-            state: any,
-            done: Function
-        ): void
-    }
-
-    interface ProcessChain {
-        $types: Array<string>,
-        AddHook: ProcessChainAddHook
-        RunHook: ProcessChainRunHook
-    }
-
-    interface RouterRoute {
-        (
-            opts: {
-                url: string,
-                $pubsub?: boolean
-                $max?: number,
-                $timeout?: number
-            },
-            cb: (req: { body: object }, res: (err: Error, res: any) => void) => void
-        ): Router
-
-
-    }
-
-    interface RouterInject {
-        (opts: {
-            url: string,
-            body?: object | string,
-            $pubsub?: boolean,
-            $max?: number,
-            $expected?: number,
-            $timeout?: number
-        }, cb: (err: Error, response: any) => void): Beanify
-
-        (opts: {
-            url: string,
-            body?: object | string,
-            $pubsub?: boolean,
-            $max?: number,
-            $expected?: number,
-            $timeout?: number
-        }): Promise<any>
-    }
-
-
-    interface Router {
-        route: RouterRoute,
-        inject: RouterInject
-    }
 }
 
 declare class Beanify {
@@ -166,23 +87,170 @@ declare class Beanify {
     after(cb: (err: Error, done: Function) => void): Beanify
     after(db: (err: Error, context: Beanify, done: Function) => void): Beanify
 
+    $root: Beanify
     $options: Beanify.Options
     $avvio: AVVIO.Avvio<Beanify>
-    $log: PINO.Logger
     $plugins: Array<string>
 
-    //beanify-nats
-    $transport: Beanify.Transport
+    //errio
+    $errio: ErrioObject
+
+    //logger
+    $log: PINO.Logger
+
+    //nats
+    $nats: NATS.Client
+
+    //router
+    route(
+        opts: {
+            url: string,
+            $pubsub?: boolean
+            $timeout?: number
+            $useGlobalPrefix?: boolean
+
+            schema?:{
+                body?:object,
+                response?:object
+            }
+
+            docs?:{
+                name?:string,
+                desc?:string
+            }
+
+            onRoute?: (route: object) => void
+
+            onBeforeInject?: (inject: object) => void
+            onInject?: (inject: object) => void
+            onAfterInject?: (inject: object) => void
+
+            onBeforeHandler?: (request: object) => void
+            onHandler?: (request: object) => void
+            onAfterHandler?: (request: object) => void
+
+            onError?: (err: Error) => void
+        },
+        cb: (req: { body: object }, res: (err: Error, res: any) => void) => void
+    ): Beanify
+    route(
+        opts: {
+            url: string,
+            handler: (req: { body: object }, res: (err: Error, res: any) => void) => void
+            $pubsub?: boolean
+            $timeout?: number
+            $useGlobalPrefix?: boolean
+
+            schema?:{
+                body?:object,
+                response?:object
+            }
+
+            docs?:{
+                name?:string,
+                desc?:string
+            }
+
+            onRoute?: (route: object) => void
+
+            onBeforeInject?: (inject: object) => void
+            onInject?: (inject: object) => void
+            onAfterInject?: (inject: object) => void
+
+            onBeforeHandler?: (request: object) => void
+            onHandler?: (request: object) => void
+            onAfterHandler?: (request: object) => void
+
+            onError?: (err: Error) => void
+        }
+    ): Beanify
+    route(
+        opts: {
+            url: string,
+            $pubsub?: boolean
+            $timeout?: number
+            $useGlobalPrefix?: boolean
+
+            schema?:{
+                body?:object,
+                response?:object
+            }
+
+            docs?:{
+                name?:string,
+                desc?:string
+            }
+
+            onRoute?: (route: object) => void
+
+            onBeforeInject?: (inject: object) => void
+            onInject?: (inject: object) => void
+            onAfterInject?: (inject: object) => void
+
+            onBeforeHandler?: (request: object) => void
+            onHandler?: (request: object) => void
+            onAfterHandler?: (request: object) => void
+
+            onError?: (err: Error) => void
+        },
+        cb: (req: { body: object }) => Promise
+    ): Beanify
+    route(
+        opts: {
+            url: string,
+            handler: (req: { body: object }) => Promise
+            $pubsub?: boolean
+            $timeout?: number
+            $useGlobalPrefix?: boolean
+
+            schema?:{
+                body?:object,
+                response?:object
+            }
+
+            docs?:{
+                name?:string,
+                desc?:string
+            }
+
+            onRoute?: (route: object) => void
+
+            onBeforeInject?: (inject: object) => void
+            onInject?: (inject: object) => void
+            onAfterInject?: (inject: object) => void
+
+            onBeforeHandler?: (request: object) => void
+            onHandler?: (request: object) => void
+            onAfterHandler?: (request: object) => void
+
+            onError?: (err: Error) => void
+        }
+    ): Beanify
+
+    inject(
+        opts: {
+            url: string,
+            body: object | string | null
+            $pubsub?: boolean
+            $timeout?: number
+            $useGlobalPrefix?: boolean
+        },
+        cb: (err: Error, res: object | string | null) => void
+    ): Beanify
+
+    inject(
+        opts: {
+            url: string,
+            body: object | string | null
+            $pubsub?: boolean
+            $timeout?: number
+            $useGlobalPrefix?: boolean
+        }
+    ): Promise
 
 
-    //beanify-chain
-    $chain: Beanify.ProcessChain
-    addHook: Beanify.ProcessChainAddHook
-
-    //beanify-router
-    $router: Beanify.Router
-    route: Beanify.RouterRoute
-    inject: Beanify.RouterInject
+    addHook(hookName: HookType, cb: Function)
+    // inject: Beanify.RouterInject
 }
 
 export = Beanify

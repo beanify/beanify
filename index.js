@@ -1,26 +1,23 @@
 const AVVIO = require('avvio')
 // const FastQ = require('fastq')
-const Pino = require('pino')
-const Errio = require('errio')
+// const Errio = require('errio')
 
 const beanifyPlugin = require('beanify-plugin')
 
 const errors = require('./errors')
-const defaultOptions = require('./default-options')
+const defaults = require('./default')
 const { sPluginNames, sChildren } = require('./symbols')
 
 class Beanify {
-  constructor (options) {
-    this._self = this
-    this._options = defaultOptions(options)
+  constructor(options) {
+    this._root = this
+    this._options = defaults.options(options)
     this._current = null
-
-    this._setupErrors()
-    this._setupLogger()
 
     this._avvio = AVVIO(this, {
       expose: {
-        use: '_use'
+        use: '_use',
+        ready: '_ready'
       },
       autostart: true,
       timeout: 5000
@@ -37,9 +34,13 @@ class Beanify {
       if (meta) {
         beanify._checkPluginDependencies(plugin)
         beanify._checkPluginDecorators(plugin)
-        this._self[sPluginNames].push(meta.name)
-      } else {
-        throw new errors.BeanifyError('Encapsulation error, need to encapsulate the plugin with beanify-plugin')
+
+
+        if (this._root[sPluginNames].indexOf(meta.name)>-1){
+          throw new errors.BeanifyError(`plugin(${meta.name}) has been already added`)
+        }
+
+        this._root[sPluginNames].push(meta.name)
       }
 
       if (plugin[beanifyPlugin.pluginScoped] === false) {
@@ -59,16 +60,10 @@ class Beanify {
       scopedInstance[sChildren] = []
       scopedInstance[beanifyPlugin.pluginPrefix] = pluginPrefix
 
-      if (meta && meta.name && beanify._options.log.useChild) {
-        scopedInstance._log = beanify._log.child({
-          plugin: meta.name
-        })
-      }
-
       // add hook
 
-      scopedInstance.decorate = function decorate () {
-        beanify.decorate.apply(this._self, arguments)
+      scopedInstance.decorate = function decorate() {
+        beanify.decorate.apply(this._root, arguments)
         return scopedInstance
       }
 
@@ -82,23 +77,23 @@ class Beanify {
     this._registerPlugins()
   }
 
-  get $options () {
+  get $options() {
     return this._options
   }
 
-  get $avvio () {
+  get $avvio() {
     return this._avvio
   }
 
-  get $log () {
-    return this._log
+  get $plugins() {
+    return this._root[sPluginNames]
   }
 
-  get $plugins () {
-    return this._self[sPluginNames]
+  get $root() {
+    return this._root
   }
 
-  decorate (prop, value, deps) {
+  decorate(prop, value, deps) {
     if (prop in this) {
       throw new errors.BeanifyError('Decoration has been already added')
     }
@@ -112,11 +107,11 @@ class Beanify {
     return this
   }
 
-  hasDecorator (prop) {
+  hasDecorator(prop) {
     return prop in this
   }
 
-  register (plugin, opts) {
+  register(plugin, opts) {
     const pluginMeta = plugin[beanifyPlugin.pluginMeta]
     let pluginOpts = pluginMeta ? pluginMeta.options : {}
 
@@ -125,7 +120,15 @@ class Beanify {
     return this
   }
 
-  _checkDecorateDependencies (deps) {
+  ready(callback) {
+    const _readyCaller = (err) => {
+      callback.bind(this.$injectDomain || this)(err)
+    }
+    this._ready(_readyCaller)
+    return this
+  }
+
+  _checkDecorateDependencies(deps) {
     for (let i = 0; i < deps.length; i++) {
       if (!(deps[i] in this)) {
         throw new errors.BeanifyError(`Missing member dependency '${deps[i]}'`)
@@ -133,7 +136,7 @@ class Beanify {
     }
   }
 
-  _checkPluginDependencies (plugin) {
+  _checkPluginDependencies(plugin) {
     const meta = plugin[beanifyPlugin.pluginMeta]
 
     const { dependencies } = meta
@@ -146,13 +149,13 @@ class Beanify {
     }
 
     dependencies.forEach((dependency) => {
-      if (this._self[sPluginNames].indexOf(dependency) === -1) {
+      if (this._root[sPluginNames].indexOf(dependency) === -1) {
         throw new errors.BeanifyError(`The dependency '${dependency}' is not registered`)
       }
     })
   }
 
-  _checkPluginDecorators (plugin) {
+  _checkPluginDecorators(plugin) {
     const meta = plugin[beanifyPlugin.pluginMeta]
 
     const { decorators } = meta
@@ -171,28 +174,24 @@ class Beanify {
     })
   }
 
-  _setupLogger () {
-    const opts = {
-      name: this._options.name,
-      prettyPrint: this._options.log.usePretty,
-      level: this._options.log.level
-    }
+  _registerPlugins() {
+    // load config form env vars
+    this.register(require('./plugins/env'))
+      .after(() => {
+        this.register(require('./plugins/logger'), this._options.pino)
 
-    this._log = Pino(opts)
-  }
+        this.register(require('./plugins/errio'), this._options.errio)
 
-  _setupErrors () {
-    Errio.setDefaults(this._options.errio)
+        this.register(require('./plugins/nats'), this._options.nats)
 
-    for (const err in errors) {
-      Errio.register(errors[err])
-    }
-  }
+        this.register(require('./plugins/router'),this._options.router)
 
-  _registerPlugins () {
-    this.register(require('./plugins/beanify-chain'))
-    this.register(require('./plugins/beanify-nats'), this._options.nats)
-    this.register(require('./plugins/beanify-router'), { main: this })
+        this.register(require('./plugins/ajv'))
+
+        this.register(require('./plugins/trace'))
+
+        this.register(require('./plugins/docs'),this._options.docs)
+      })
   }
 }
 

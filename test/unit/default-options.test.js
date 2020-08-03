@@ -12,10 +12,8 @@ tap.test('defaultOptions test', (t) => {
     nats: {
       json: true
     },
-    log: {
-      usePretty: false,
-      level: 'warn',
-      useChild: false
+    pino: {
+      level: 'warn'
     },
     name: 'test',
     errio: {
@@ -37,8 +35,7 @@ tap.test('defaultOptions test with custom setting', (t) => {
     nats: {
       url: 'nats://localhost:4222'
     },
-    log: {
-      useChild: true,
+    pino: {
       level: 'info'
     },
     errio: {
@@ -51,10 +48,8 @@ tap.test('defaultOptions test with custom setting', (t) => {
       json: true,
       url: 'nats://localhost:4222'
     },
-    log: {
-      usePretty: false,
-      level: 'info',
-      useChild: true
+    pino: {
+      level: 'info'
     },
     name: 'test',
     errio: {
