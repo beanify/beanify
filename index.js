@@ -35,12 +35,13 @@ class Beanify {
         beanify._checkPluginDependencies(plugin)
         beanify._checkPluginDecorators(plugin)
 
-
-        if (this._root[sPluginNames].indexOf(meta.name)>-1){
+        if (this._root[sPluginNames].indexOf(meta.name)>-1 && meta.name!='beanify-autoload'){
           throw new errors.BeanifyError(`plugin(${meta.name}) has been already added`)
         }
 
-        this._root[sPluginNames].push(meta.name)
+        if(this._root[sPluginNames].indexOf(meta.name)==-1){
+          this._root[sPluginNames].push(meta.name)
+        }
       }
 
       if (plugin[beanifyPlugin.pluginScoped] === false) {
