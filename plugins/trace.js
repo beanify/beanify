@@ -6,44 +6,75 @@ module.exports = (beanify, opts, done) => {
   beanify.addHook('onBeforeInject', (inject) => {
     const { $req } = inject
 
+    if (inject.$pubsub == true) {
+      return
+    }
+
     $req.$trace = $req.$trace || {}
     $req.$trace.beforeInject = Date.now()
+    inject.$trace = $req.$trace
   })
 
   beanify.addHook('onInject', (inject) => {
     const { $req } = inject
 
+    if (inject.$pubsub == true) {
+      return
+    }
+
     $req.$trace = $req.$trace || {}
     $req.$trace.inject = Date.now()
+    inject.$trace = $req.$trace
   })
 
   beanify.addHook('onAfterInject', (inject) => {
-    const { $req ,$res} = inject
-    inject.$trace=$res.$trace||{}
+    const { $req, $res } = inject
+
+    if (inject.$pubsub == true) {
+      return
+    }
+
+    inject.$trace = $res.$trace || {}
     inject.$trace.afterInject = Date.now()
 
-    $req.$trace={}
-    $res.$trace={}
+    $req.$trace = {}
+    $res.$trace = {}
   })
 
-  beanify.addHook('onBeforeHandler', (request) => {
-    const { $req } = request
+  beanify.addHook('onBeforeHandler', (route) => {
+    const { $req } = route
+
+    if (route.$pubsub == true) {
+      return
+    }
+
     $req.$trace = $req.$trace || {}
     $req.$trace.beforeHandler = Date.now()
+    route.$trace = $req.$trace
   })
 
-  beanify.addHook('onHandler', (request) => {
-    const { $req } = request
+  beanify.addHook('onHandler', (route) => {
+    const { $req } = route
+
+    if (route.$pubsub == true) {
+      return
+    }
+
     $req.$trace = $req.$trace || {}
     $req.$trace.handler = Date.now()
+    route.$trace = $req.$trace
   })
 
-  beanify.addHook('onAfterHandler', (request) => {
-    const { $req,$res } = request
+  beanify.addHook('onAfterHandler', (route) => {
+    const { $req, $res } = route
+    if (route.$pubsub == true) {
+      return
+    }
+
     $req.$trace = $req.$trace || {}
     $req.$trace.afterHandler = Date.now()
-
-    $res.$trace=$req.$trace
+    $res.$trace = $req.$trace
+    route.$trace = $req.$trace
   })
 
   done()
