@@ -69,11 +69,11 @@ module.exports = (beanify, opts, done) => {
     const schema = route.schema || {}
     const pubsub = route.$pubsub
     const timeout = route.$timeout
-    const url = route.url.replace(/.:/g,'.@')
+    const url = route.url.replace(/.:/g, '.@')
 
     const filePath = path.join(docsDir, `${url}.md`)
     const relativePath = filePath.replace(docsDir, '.')
-    docs.name=docs.name||'未知接口'
+    docs.name = docs.name || '未知接口'
 
     if (fs.existsSync(filePath)) {
       throw new Error(`${filePath} Already exists`)
@@ -84,22 +84,22 @@ module.exports = (beanify, opts, done) => {
 
 
     fs.appendFileSync(filePath, `## 基本 \r\n\r\n`)
-    fs.appendFileSync(filePath, `* URL:${url.replace(/.@/g,".:")} \r\n`)
-    fs.appendFileSync(filePath, `* $pubsub:${pubsub} \r\n`)
-    fs.appendFileSync(filePath, `* $timeout:${timeout} \r\n`)
-    fs.appendFileSync(filePath, `* $useGlobalPrefix:${route.$useGlobalPrefix} \r\n\r\n`)
+    fs.appendFileSync(filePath, `* URL: **${url.replace(/.@/g, ".:")}** \r\n`)
+    fs.appendFileSync(filePath, `* $pubsub: **${pubsub}** \r\n`)
+    fs.appendFileSync(filePath, `* $timeout: **${timeout}** \r\n`)
+    fs.appendFileSync(filePath, `* $useGlobalPrefix: **${route.$useGlobalPrefix}** \r\n\r\n`)
 
     fs.appendFileSync(filePath, `## 参数[body] \r\n\r\n`)
     fs.appendFileSync(filePath, '```json\r\n')
-    fs.appendFileSync(filePath, schema.body?JSON.stringify(schema.body, null, '\t'):'')
+    fs.appendFileSync(filePath, schema.body ? JSON.stringify(schema.body, null, '\t') : '')
     fs.appendFileSync(filePath, '\r\n```\r\n\r\n')
 
     fs.appendFileSync(filePath, `## 返回[response] \r\n\r\n`)
     fs.appendFileSync(filePath, '```json\r\n')
-    fs.appendFileSync(filePath, schema.response?JSON.stringify(schema.response, null, '\t'):'')
+    fs.appendFileSync(filePath, schema.response ? JSON.stringify(schema.response, null, '\t') : '')
     fs.appendFileSync(filePath, '\r\n```\r\n\r\n')
 
-    fs.appendFileSync(readMeFilePath, `* [${docs.name}](${relativePath})\r\n`)
+    fs.appendFileSync(readMeFilePath, `* [${docs.name}](${relativePath.replace(/\\/g, '/')})\r\n`)
 
   })
 
