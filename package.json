@@ -1,6 +1,6 @@
 {
   "name": "beanify",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "micro-services nats nats-micro-services",
   "main": "index.js",
   "scripts": {

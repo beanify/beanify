@@ -16,13 +16,13 @@ module.exports = (instance, opts, done) => {
 
     onBeforeHandler: [],
     onHandler: [],
-    onAfterHandler:[],
+    onAfterHandler: [],
 
     onError: []
   }
 
   const _routeQ = FastQ(instance, function (route, next) {
-    onHookCaller('onRoute',route)
+    onHookCaller('onRoute', route)
       .then(() => {
         const {
           $pubsub,
@@ -73,11 +73,11 @@ module.exports = (instance, opts, done) => {
   }
 
   const _injectQ = FastQ(instance, function (inject, next) {
-    const beginTime=Date.now()
+    const beginTime = Date.now()
     this.$log.info(`begin inject(${beginTime}):${inject.url}`)
-    onHookCaller('onBeforeInject',inject)
+    onHookCaller('onBeforeInject', inject)
       .then(async () => {
-        await onHookCaller('onInject',inject)
+        await onHookCaller('onInject', inject)
 
         const {
           url,
@@ -91,6 +91,7 @@ module.exports = (instance, opts, done) => {
 
         if ($pubsub) {
           await natsPublish.bind($nats)(url, inject.$req)
+          inject.handler(null)
         } else {
           const reqOptions = {
             timeout: $timeout,
@@ -98,14 +99,14 @@ module.exports = (instance, opts, done) => {
           }
           _result = await natsRequest.bind($nats)(url, inject.$req, reqOptions)
 
-          inject.handler(null,_result.res)
-          inject.$res=_result
+          inject.handler(null, _result.res)
+          inject.$res = _result
         }
 
-        await onHookCaller('onAfterInject',inject)
-        const endTime=Date.now()
+        await onHookCaller('onAfterInject', inject)
+        const endTime = Date.now()
         this.$log.info(`finished inject(${endTime}):${inject.url}`)
-        this.$log.info(`duration inject(${((endTime-beginTime)/1000)}ms):${inject.url}`)
+        this.$log.info(`duration inject(${((endTime - beginTime) / 1000)}ms):${inject.url}`)
         next()
       }).catch((err) => {
         onErrorHookCaller(err, inject.onError, () => { })
@@ -188,7 +189,7 @@ module.exports = (instance, opts, done) => {
     }
     inject.$parent = options
     inject.$log = instance.$log
-    inject.inject=instance.inject
+    inject.inject = instance.inject
     let returned = null
     if (onResponse) {
       inject.handler = onResponse.bind(inject)
@@ -241,7 +242,7 @@ module.exports = (instance, opts, done) => {
     return this
   }
 
-  function onHookCaller(hookName,instance){
+  function onHookCaller(hookName, instance) {
     return new Promise((resolve, reject) => {
       hooks = [...globalHooks[hookName]]
       if (typeof instance[hookName] === 'function') {
@@ -262,7 +263,7 @@ module.exports = (instance, opts, done) => {
 
     const { $nats } = instance
     const request = Object.create(route)
-    const beginTime=Date.now()
+    const beginTime = Date.now()
 
     request.$req = {
       ...req,
@@ -273,17 +274,17 @@ module.exports = (instance, opts, done) => {
     }
 
     request.$replyTo = replyTo || ''
-    const natsError=(err)=>{
+    const natsError = (err) => {
       if (request.$pubsub == false && request.$replyTo != '') {
         $nats.publish(request.$replyTo, {
           err: instance.$errio.toObject(err)
         })
       }
     }
-    const natsResponse=(payload)=>{
-      const endTime=Date.now()
+    const natsResponse = (payload) => {
+      const endTime = Date.now()
       instance.$log.info(`request completed(${endTime}):${request.$req.fromUrl}`)
-      instance.$log.info(`request duration(${(endTime-beginTime)/1000}ms):${request.$req.fromUrl}`)
+      instance.$log.info(`request duration(${(endTime - beginTime) / 1000}ms):${request.$req.fromUrl}`)
       if (request.$pubsub == false && request.$replyTo != '') {
         $nats.publish(request.$replyTo, payload)
       }
@@ -291,46 +292,46 @@ module.exports = (instance, opts, done) => {
 
     instance.$log.info(`request incomming(${beginTime}):${request.$req.fromUrl}`)
 
-    onHookCaller('onBeforeHandler',request)
+    onHookCaller('onBeforeHandler', request)
       .then(async () => {
-        await onHookCaller('onHandler',request)
+        await onHookCaller('onHandler', request)
 
-        let sent=false
+        let sent = false
         const _sentCallback = (err, res) => {
-          if(sent){
+          if (sent) {
             return
           }
-          sent=true
-          
-          if(err!=null){
+          sent = true
+
+          if (err != null) {
             natsError(err)
             return
           }
-          
-          request.$res={
+
+          request.$res = {
             res
           }
 
-          onHookCaller('onAfterHandler',request)
-            .then(()=>{
+          onHookCaller('onAfterHandler', request)
+            .then(() => {
               natsResponse(request.$res)
             })
-            .catch((err)=>{
+            .catch((err) => {
               onErrorHookCaller(err, request.onError, () => { })
               natsError(err)
             })
         }
 
         const _handler = request.handler.bind(instance.$root)
-        const _result = _handler(request.$req,_sentCallback)
-        if(_result&&typeof _result.then === 'function'){
+        const _result = _handler(request.$req, _sentCallback)
+        if (_result && typeof _result.then === 'function') {
           await _result
-              .then((res)=>{
-                _sentCallback(null,res)
-              })
-              .catch((err)=>{
-                _sentCallback(err)
-              })
+            .then((res) => {
+              _sentCallback(null, res)
+            })
+            .catch((err) => {
+              _sentCallback(err)
+            })
         }
 
       })
