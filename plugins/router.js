@@ -304,6 +304,7 @@ module.exports = (instance, opts, done) => {
           sent = true
 
           if (err != null) {
+            onErrorHookCaller(err, request.onError, () => { })
             natsError(err)
             return
           }
@@ -322,16 +323,20 @@ module.exports = (instance, opts, done) => {
             })
         }
 
-        const _handler = request.handler.bind(instance.$root)
-        const _result = _handler(request.$req, _sentCallback)
-        if (_result && typeof _result.then === 'function') {
-          await _result
-            .then((res) => {
-              _sentCallback(null, res)
-            })
-            .catch((err) => {
-              _sentCallback(err)
-            })
+        try {
+          const _handler = request.handler.bind(instance.$root)
+          const _result = _handler(request.$req, _sentCallback)
+          if (_result && typeof _result.then === 'function') {
+            await _result
+              .then((res) => {
+                _sentCallback(null, res)
+              })
+              .catch((err) => {
+                _sentCallback(err)
+              })
+          }
+        }catch(err){
+          _sentCallback(err)
         }
 
       })
