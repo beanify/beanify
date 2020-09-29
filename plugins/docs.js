@@ -69,7 +69,11 @@ module.exports = (beanify, opts, done) => {
     const schema = route.schema || {}
     const pubsub = route.$pubsub
     const timeout = route.$timeout
-    const url = route.url.replace(/.:/g, '.@')
+    const globalPrefix = beanify._options.router.prefix
+    let url = route.url.replace(/.:/g, '.@')
+    if (globalPrefix != '' && url.indexOf(globalPrefix) == 0) {
+      url = url.substr(globalPrefix.length + 1)
+    }
 
     const filePath = path.join(docsDir, `${url}.md`)
     const relativePath = filePath.replace(docsDir, '.')
@@ -87,7 +91,6 @@ module.exports = (beanify, opts, done) => {
     fs.appendFileSync(filePath, `* **URL**: **${url.replace(/.@/g, ".:")}** \r\n`)
     fs.appendFileSync(filePath, `* **$pubsub**: **${pubsub}** \r\n`)
     fs.appendFileSync(filePath, `* **$timeout**: **${timeout}** \r\n`)
-    fs.appendFileSync(filePath, `* **$useGlobalPrefix**: **${route.$useGlobalPrefix}** \r\n\r\n`)
 
     fs.appendFileSync(filePath, `## 参数[body] \r\n\r\n`)
     fs.appendFileSync(filePath, '```json\r\n')
