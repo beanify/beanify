@@ -26,11 +26,11 @@ const SchemaOptions = {
         enum: ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'],
         default: "debug"
       },
-      BEANIFY_PINO_PERTTY: {
+      BEANIFY_PINO_PRETTY: {
         type: 'boolean',
         default: false
       },
-      BEANITFY_ROUTER_PREFIX: {
+      BEANIFY_ROUTER_PREFIX: {
         type: 'string',
         default: ''
       },
