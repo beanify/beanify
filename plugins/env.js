@@ -1,5 +1,5 @@
 const envSchema = require("env-schema")
-const objMerge=require("merge")
+const objMerge = require("merge")
 
 const SchemaOptions = {
   dotenv: true,
@@ -25,10 +25,16 @@ const SchemaOptions = {
       BEANIFY_PINO_LEVEL: {
         enum: ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'],
         default: "debug"
-      }
+      },
+      BEANIFY_PINO_PERTTY: {
+        type: 'boolean',
+        default: false
+      },
+      BEANITFY_ROUTER_PREFIX: {
+        type: 'string',
+        default: ''
+      },
     }
-
-
   }
 }
 
@@ -51,7 +57,7 @@ module.exports = (beanify, opts, done) => {
     })
 
   // override $root._options filed
-  beanify.$root._options=objMerge.recursive(beanify.$root._options,envOptions)
+  beanify.$root._options = objMerge.recursive(beanify.$root._options, envOptions)
 
   done()
 }

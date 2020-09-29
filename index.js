@@ -35,11 +35,11 @@ class Beanify {
         beanify._checkPluginDependencies(plugin)
         beanify._checkPluginDecorators(plugin)
 
-        if (this._root[sPluginNames].indexOf(meta.name)>-1 && meta.name!='beanify-autoload'){
+        if (this._root[sPluginNames].indexOf(meta.name) > -1 && meta.name != 'beanify-autoload') {
           throw new errors.BeanifyError(`plugin(${meta.name}) has been already added`)
         }
 
-        if(this._root[sPluginNames].indexOf(meta.name)==-1){
+        if (this._root[sPluginNames].indexOf(meta.name) == -1) {
           this._root[sPluginNames].push(meta.name)
         }
       }
@@ -179,19 +179,21 @@ class Beanify {
     // load config form env vars
     this.register(require('./plugins/env'))
       .after(() => {
+        
+        this._options.pino.prettyPrint = this._options.pino.pretty
         this.register(require('./plugins/logger'), this._options.pino)
 
         this.register(require('./plugins/errio'), this._options.errio)
 
         this.register(require('./plugins/nats'), this._options.nats)
 
-        this.register(require('./plugins/router'),this._options.router)
+        this.register(require('./plugins/router'), this._options.router)
 
         this.register(require('./plugins/ajv'))
 
         this.register(require('./plugins/trace'))
 
-        this.register(require('./plugins/docs'),this._options.docs)
+        this.register(require('./plugins/docs'), this._options.docs)
       })
   }
 }

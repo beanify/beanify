@@ -32,6 +32,16 @@ Beanify is an improvement from [Hemera](https://github.com/hemerajs/hemera). Fir
 * [beanify-url](https://github.com/beanjs-framework/beanify-url)
 * [beanify-autoload](https://github.com/beanjs-framework/beanify-autoload)
 
+## Env
+
+* BEANIFY_NATS_URL
+* BEANIFY_NATS_SERVERS
+* BEANIFY_NATS_USER
+* BEANIFY_NATS_PASS
+* BEANIFY_NATS_TOKEN
+* BEANIFY_PINO_LEVEL
+* BEANIFY_PINO_PERTTY
+* BEANITFY_ROUTER_PREFIX
 
 ## Professional services
 

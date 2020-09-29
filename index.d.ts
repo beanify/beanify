@@ -33,7 +33,7 @@ declare namespace Beanify {
 
     interface Options {
         nats: NATS.ClientOpts
-        log?: PINO.LoggerOptions,
+        pino?: PINO.LoggerOptions,
         errio?: ErrioOptions,
         router?: { prefix?: string }
         docs?: { dir?: string ,enable?:boolean}
