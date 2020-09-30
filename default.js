@@ -107,6 +107,10 @@ const routeOptionsSchema = {
       type: 'number',
       default: 5000
     },
+    $queue: {
+      type: 'string',
+      default: ''
+    }
   },
   default: {},
   required: ['url'],

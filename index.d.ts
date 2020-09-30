@@ -36,7 +36,7 @@ declare namespace Beanify {
         pino?: PINO.LoggerOptions,
         errio?: ErrioOptions,
         router?: { prefix?: string }
-        docs?: { dir?: string ,enable?:boolean}
+        docs?: { dir?: string, enable?: boolean }
     }
 
     interface DoneCallback {
@@ -105,18 +105,19 @@ declare class Beanify {
     route(
         opts: {
             url: string,
+            $queue?: string,
             $pubsub?: boolean
             $timeout?: number
             $useGlobalPrefix?: boolean
 
-            schema?:{
-                body?:object,
-                response?:object
+            schema?: {
+                body?: object,
+                response?: object
             }
 
-            docs?:{
-                name?:string,
-                desc?:string
+            docs?: {
+                name?: string,
+                desc?: string
             }
 
             onRoute?: (route: object) => void
@@ -137,18 +138,19 @@ declare class Beanify {
         opts: {
             url: string,
             handler: (req: { body: object }, res: (err: Error, res: any) => void) => void
+            $queue?: string,
             $pubsub?: boolean
             $timeout?: number
             $useGlobalPrefix?: boolean
 
-            schema?:{
-                body?:object,
-                response?:object
+            schema?: {
+                body?: object,
+                response?: object
             }
 
-            docs?:{
-                name?:string,
-                desc?:string
+            docs?: {
+                name?: string,
+                desc?: string
             }
 
             onRoute?: (route: object) => void
@@ -167,18 +169,19 @@ declare class Beanify {
     route(
         opts: {
             url: string,
+            $queue?: string,
             $pubsub?: boolean
             $timeout?: number
             $useGlobalPrefix?: boolean
 
-            schema?:{
-                body?:object,
-                response?:object
+            schema?: {
+                body?: object,
+                response?: object
             }
 
-            docs?:{
-                name?:string,
-                desc?:string
+            docs?: {
+                name?: string,
+                desc?: string
             }
 
             onRoute?: (route: object) => void
@@ -199,18 +202,19 @@ declare class Beanify {
         opts: {
             url: string,
             handler: (req: { body: object }) => Promise
+            $queue?: string,
             $pubsub?: boolean
             $timeout?: number
             $useGlobalPrefix?: boolean
 
-            schema?:{
-                body?:object,
-                response?:object
+            schema?: {
+                body?: object,
+                response?: object
             }
 
-            docs?:{
-                name?:string,
-                desc?:string
+            docs?: {
+                name?: string,
+                desc?: string
             }
 
             onRoute?: (route: object) => void

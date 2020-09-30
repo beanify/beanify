@@ -3,6 +3,7 @@ const beanifyPlugin = require("beanify-plugin")
 const FastQ = require("fastq");
 const errors = require("../errors")
 const asyncs = require("async");
+const path = require("path")
 
 module.exports = (instance, opts, done) => {
 
@@ -25,22 +26,25 @@ module.exports = (instance, opts, done) => {
     onHookCaller('onRoute', route)
       .then(() => {
         const {
-          $pubsub,
+          $queue,
           $timeout,
           url
         } = route
 
-        const queueTopic = `queue.${url}`
+        const { name: pName } = require(path.join(process.cwd(), 'package.json'))
 
-        if ($pubsub) {
-          route.$sid = $nats.subscribe(url, {
+        const queuePrefix = $queue == '' ? pName : $queue
+        const queueTopic = `${queuePrefix}.${url}`
 
-          }, onRequestCaller.bind(this, route))
-        } else {
-          route.$sid = $nats.subscribe(url, {
-            queue: queueTopic
-          }, onRequestCaller.bind(this, route))
-        }
+        // if ($pubsub) {
+        //   route.$sid = $nats.subscribe(url, {
+
+        //   }, onRequestCaller.bind(this, route))
+        // } else {
+        route.$sid = $nats.subscribe(url, {
+          queue: queueTopic
+        }, onRequestCaller.bind(this, route))
+        // }
 
         let tmrId = null
         $nats.flush(() => {
@@ -335,7 +339,7 @@ module.exports = (instance, opts, done) => {
                 _sentCallback(err)
               })
           }
-        }catch(err){
+        } catch (err) {
           _sentCallback(err)
         }
 
