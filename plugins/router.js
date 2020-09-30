@@ -36,15 +36,9 @@ module.exports = (instance, opts, done) => {
         const queuePrefix = $queue == '' ? pName : $queue
         const queueTopic = `${queuePrefix}.${url}`
 
-        // if ($pubsub) {
-        //   route.$sid = $nats.subscribe(url, {
-
-        //   }, onRequestCaller.bind(this, route))
-        // } else {
         route.$sid = $nats.subscribe(url, {
           queue: queueTopic
         }, onRequestCaller.bind(this, route))
-        // }
 
         let tmrId = null
         $nats.flush(() => {

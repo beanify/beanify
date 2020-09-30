@@ -69,28 +69,35 @@ module.exports = (beanify, opts, done) => {
     const schema = route.schema || {}
     const pubsub = route.$pubsub
     const timeout = route.$timeout
+    const queue=route.$queue
     const globalPrefix = beanify._options.router.prefix
     let url = route.url.replace(/.:/g, '.@')
     if (globalPrefix != '' && url.indexOf(globalPrefix) == 0) {
       url = url.substr(globalPrefix.length + 1)
     }
 
-    const filePath = path.join(docsDir, `${url}.md`)
+    const fileName = queue == '' ? url : `${queue}.${url}`
+    const filePath = path.join(docsDir, `${fileName}.md`)
     const relativePath = filePath.replace(docsDir, '.')
     docs.name = docs.name || '未知接口'
 
     if (fs.existsSync(filePath)) {
-      throw new Error(`${filePath} Already exists`)
+      return
+      // throw new Error(`${filePath} Already exists`)
     }
 
-    fs.writeFileSync(filePath, `# ${docs.name || url} \r\n\r\n`)
+    if(queue!=''){
+      fs.writeFileSync(filePath, `# ${docs.name || url} [${queue}] \r\n\r\n`)
+    }else{
+      fs.writeFileSync(filePath, `# ${docs.name || url} \r\n\r\n`)
+    }
     fs.appendFileSync(filePath, `${docs.description || docs.desc || ''} \r\n\r\n`)
 
 
     fs.appendFileSync(filePath, `## 基本 \r\n\r\n`)
     fs.appendFileSync(filePath, `* **URL**: **${url.replace(/.@/g, ".:")}** \r\n`)
     fs.appendFileSync(filePath, `* **$pubsub**: **${pubsub}** \r\n`)
-    fs.appendFileSync(filePath, `* **$timeout**: **${timeout}** \r\n`)
+    fs.appendFileSync(filePath, `* **$timeout**: **${timeout}** \r\n\r\n`)
 
     fs.appendFileSync(filePath, `## 参数[body] \r\n\r\n`)
     fs.appendFileSync(filePath, '```json\r\n')
