@@ -1,7 +1,6 @@
 const fs = require("fs")
 const path = require("path")
 const envSchema = require("env-schema")
-const { dir } = require("console")
 
 module.exports = (beanify, opts, done) => {
 
@@ -69,14 +68,18 @@ module.exports = (beanify, opts, done) => {
     const schema = route.schema || {}
     const pubsub = route.$pubsub
     const timeout = route.$timeout
-    const queue=route.$queue
+    const queue = route.$queue
     const globalPrefix = beanify._options.router.prefix
     let url = route.url.replace(/.:/g, '.@')
     if (globalPrefix != '' && url.indexOf(globalPrefix) == 0) {
       url = url.substr(globalPrefix.length + 1)
     }
 
-    const fileName = queue == '' ? url : `${queue}.${url}`
+    if (queue != '') {
+      return
+    }
+
+    const fileName = url
     const filePath = path.join(docsDir, `${fileName}.md`)
     const relativePath = filePath.replace(docsDir, '.')
     docs.name = docs.name || '未知接口'
@@ -86,11 +89,11 @@ module.exports = (beanify, opts, done) => {
       // throw new Error(`${filePath} Already exists`)
     }
 
-    if(queue!=''){
-      fs.writeFileSync(filePath, `# ${docs.name || url} [${queue}] \r\n\r\n`)
-    }else{
-      fs.writeFileSync(filePath, `# ${docs.name || url} \r\n\r\n`)
-    }
+    // if (queue != '') {
+    //   fs.writeFileSync(filePath, `# ${docs.name || url} [${queue}] \r\n\r\n`)
+    // } else {
+    fs.writeFileSync(filePath, `# ${docs.name || url} \r\n\r\n`)
+    // }
     fs.appendFileSync(filePath, `${docs.description || docs.desc || ''} \r\n\r\n`)
 
 
