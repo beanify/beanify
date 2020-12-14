@@ -1,38 +1,36 @@
-<p align="center">
-<img src="./imgs/logo.png" alt="Beanify" style="max-width:100%;">
-</p>
+<div align="center">
+<img src="./imgs/beanify.png" alt="Beanify" style="width:64px">
+<h1>Beanify</h1>
+</div>
 
 <p align="center">
 A <a href="http://nodejs.org/">Node.js</a> microservices toolkit for the <a href="https://nats.io">NATS messaging system</a>
 </p>
 
-* **Node:** v8+
-* **Lead Maintainer:** [beanjs](https://github.com/beanjs)
-
-
 Beanify is an improvement from [Hemera](https://github.com/hemerajs/hemera). First, it improves the microservice registration logic of the __add__ function in Hemera, allowing you to register your microservices in any [beanifyPlugin](https://github.com/beanjs-framework/beanify-plugin), rather than after the ready function is penalized. Secondly, more [lifecycle Hook](./docs/lifecycle-hook.md) functions are provided, allowing you to be more involved in routing registration, service processing, service usage, and so on. Finally, with a more plug-in development approach, deep integration with the [AVVIO](https://github.com/mcollina/avvio) framework, all plug-ins, all services are plug-in
 
-## Documentation
+## Requirements
 
-[![JavaScript Style Guide](https://cdn.rawgit.com/standard/standard/master/badge.svg)](https://github.com/standard/standard)
+Node.js v10 LTS (10.16.0) or later.
+
+## Documentation
 
 * [Installation](./docs/installation.md)
 * [lifecycle Hook](./docs/lifecycle-hook.md)
 * [Request and Reply](./docs/request-and-reply.md)
 * [Publish and Subscribe](./docs/publish-and-subscribe.md)
+ 
+## Ecosystem
 
-## Generator
+* [beanify-plugin](https://github.com/beanify/beanify-plugin)
+
 
 * [beanify-cli](https://github.com/beanjs-framework/beanify-cli)
-
-## Plugins
-
-* [beanify-plugin](https://github.com/beanjs-framework/beanify-plugin)
 * [beanify-env](https://github.com/beanjs-framework/beanify-env)
 * [beanify-url](https://github.com/beanjs-framework/beanify-url)
 * [beanify-autoload](https://github.com/beanjs-framework/beanify-autoload)
 
-## Env
+## Environment
 
 * BEANIFY_NATS_URL
 * BEANIFY_NATS_SERVERS
@@ -41,8 +39,5 @@ Beanify is an improvement from [Hemera](https://github.com/hemerajs/hemera). Fir
 * BEANIFY_NATS_TOKEN
 * BEANIFY_PINO_LEVEL
 * BEANIFY_PINO_PERTTY
-* BEANITFY_ROUTER_PREFIX
-
-## Professional services
-
-Beanify is free for any use (MIT license). If you are in production don't miss the professional support service. For courses and training send me an email to [502554248@qq.com](502554248@qq.com)
+* BEANIFY_ROUTER_PREFIX
+* NODE_ENV

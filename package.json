@@ -1,26 +1,30 @@
 {
   "name": "beanify",
-  "version": "2.1.2",
+  "version": "3.0.0",
   "description": "micro-services nats nats-micro-services",
   "main": "index.js",
   "scripts": {
-    "test": "standard && tap test/**/*.test.js ",
-    "unit": "tap test/**/*.test.js --100 --cov --coverage-report=lcov",
-    "fix": "standard --fix"
+    
   },
   "author": "beanjs",
   "license": "MIT",
+  "engines": {
+    "node": ">=10.16.0"
+  },
   "devDependencies": {
     "pino-pretty": "^3.5.0",
     "standard": "^14.3.1",
     "tap": "^14.9.1"
   },
-  "typings": "./index.d.ts",
+  "typings": "index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beanify/beanify.git"
+  },
   "dependencies": {
     "ajv": "^6.10.2",
     "async": "^3.2.0",
     "avvio": "^6.2.2",
-    "beanify-plugin": "^1.0.2",
     "env-schema": "^1.1.0",
     "errio": "^1.2.2",
     "fastq": "^1.6.0",
