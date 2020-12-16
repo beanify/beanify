@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "properties": {
+    "url": {
+      "type": "string"
+    },
+    "attribute": {
+      "type": "object",
+      "default": {}
+    },
+    "$queue": {
+      "type": "string"
+    },
+    "$pubsub": {
+      "type": "boolean",
+      "default": false
+    },
+    "$timeout": {
+      "type": "number",
+      "default": 5000
+    },
+    "$usePrefix": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": ["url"]
+}

@@ -1,0 +1,47 @@
+{
+  "type": "object",
+  "properties": {
+    "nats": {
+      "type": "object",
+      "properties": { "json": { "type": "boolean", "default": true } },
+      "default": {}
+    },
+    "pino": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "enum": [
+            "fatal",
+            "error",
+            "warn",
+            "info",
+            "debug",
+            "trace",
+            "silent"
+          ],
+          "default": "warn"
+        },
+        "name": { "type": "string", "default": "[Beanify]" }
+      },
+      "default": {}
+    },
+    "errio": {
+      "type": "object",
+      "properties": {
+        "recursive": { "type": "boolean", "default": true },
+        "inherited": { "type": "boolean", "default": true },
+        "stack": { "type": "boolean", "default": false },
+        "private": { "type": "boolean", "default": false },
+        "exclude": { "type": "array", "default": [] },
+        "include": { "type": "array", "default": [] }
+      },
+      "default": {}
+    },
+    "router": {
+      "type": "object",
+      "properties": { "prefix": { "type": "string", "default": "" } },
+      "default": {}
+    }
+  },
+  "default": {}
+}
