@@ -6,6 +6,7 @@ module.exports = {
   kBeanifyVersion: Symbol('beanify.version'),
   kBeanifyChildren: Symbol('beanify.children'),
   kBeanifyRoutes: Symbol('beanify.routes'),
+  kBeanifyDecorates: Symbol('beanify.decorates'),
   kBeanifyPluginMeta: Symbol.for('beanify.plugin.meta'),
   kBeanifyAvvio: Symbol('beanify.avvio'),
   kQueueRoutes: Symbol('queue.routes'),

@@ -133,10 +133,14 @@ beanify
 ## Documentation
 
 - [Getting Started](./docs/Getting-Started.md)
-- [Server](./docs/Server.md)
+- [Encapsulation](./docs/Encapsulation.md)
 - [Decorators](./docs/Decorators.md)
-- [Request and Reply](./docs/request-and-reply.md)
-- [Publish and Subscribe](./docs/publish-and-subscribe.md)
+- [Plugins](./docs/Plugins.md)
+- [Hooks](./docs/Hooks.md)
+- [Server](./docs/Server.md)
+
+<!-- - [Request and Reply](./docs/request-and-reply.md)
+- [Publish and Subscribe](./docs/publish-and-subscribe.md) -->
 
 ## Ecosystem
 

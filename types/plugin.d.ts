@@ -1,7 +1,11 @@
 import { Beanify } from './beanify'
 
 export type PluginDoneCallback = (err?: Error) => void
-export type PluginOptions = Record<string, any>
+export interface PluginOptions {
+  name?: string
+  prefix?: string
+  beanify?: string
+}
 export type PluginCallback = (
   beanify: Beanify,
   opts: PluginOptions,
@@ -10,7 +14,7 @@ export type PluginCallback = (
 
 export interface BeanifyPlugin<
   Plugin extends PluginCallback = PluginCallback,
-  Options extends PluginOptions = Record<string, any>
+  Options extends PluginOptions = PluginOptions
 > {
   (plugin: Plugin, opts: Options): Beanify
 }

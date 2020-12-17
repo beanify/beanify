@@ -8,7 +8,8 @@ const {
   kBeanifyChildren,
   kBeanifyRoutes,
   kBeanifyAvvio,
-  kBeanifyName
+  kBeanifyName,
+  kBeanifyDecorates
 } = require('./symbols')
 
 const { DecorateExistsError } = require('./errors')
@@ -35,6 +36,7 @@ function Beanify (opts) {
   this[kBeanifyVersion] = require('./package.json').version
   this[kBeanifyChildren] = []
   this[kBeanifyRoutes] = []
+  this[kBeanifyDecorates] = []
   this[kBeanifyAvvio] = AVVIO(this, {
     expose: {
       use: 'register',
@@ -54,15 +56,17 @@ function Beanify (opts) {
 }
 
 Beanify.prototype.decorate = function (prop, value) {
-  if (prop in this.$root) {
+  if (prop in this) {
     throw new DecorateExistsError()
   }
 
-  this.$root[prop] = value
+  this[prop] = value
+  this[kBeanifyDecorates].push(prop)
+  return this
 }
 
 Beanify.prototype.hasDecorator = function (prop) {
-  return prop in this.$root
+  return prop in this
 }
 
 Beanify.prototype.route = function (opts, handler) {
@@ -94,6 +98,21 @@ Beanify.prototype.print = function () {
     }
   }
 
+  function printDecorates (level, child) {
+    const decorates = child[kBeanifyDecorates]
+    if (decorates.length > 0) {
+      const rPad = ''.padEnd((level + 1) * tab, tabPad)
+      const rLine = `${rPad}${tabPrefix}decorates`
+      child.$log.info(rLine)
+
+      for (const name of decorates) {
+        const uPad = ''.padEnd(rPad.length + tab, tabPad)
+        const uLine = `${uPad}${tabPrefix}${name}`
+        child.$log.info(uLine)
+      }
+    }
+  }
+
   function printPrefix (level, child) {
     const prefix = child[kBeanifyRouterPrefix]
     if (prefix && prefix !== '') {
@@ -116,6 +135,7 @@ Beanify.prototype.print = function () {
     }
 
     printRoutes(level, child)
+    printDecorates(level, child)
     printPrefix(level, child)
 
     const children = child[kBeanifyChildren]
