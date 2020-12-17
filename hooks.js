@@ -1,8 +1,16 @@
 const { isArrow } = require('extra-function')
 const asyncLib = require('async')
+const { replySending } = require('./reply')
 
-const { kBeanifyRunHooks, kBeanifyRunHooksAsync } = require('./symbols')
 const { HookCallbackError } = require('./errors')
+const {
+  kInjectTime,
+  kRouteTime,
+  kRouteRequest,
+  kRouteReply,
+  kReplySent,
+  kReplyTo
+} = require('./symbols')
 
 const hooks = {
   onClose: [],
@@ -107,17 +115,87 @@ function initHooks () {
   this.$log.info('decorate addHook')
   this.decorate('addHook', addHook.bind(this))
 
-  this.$root[kBeanifyRunHooks] = runHooks
-  this.$root[kBeanifyRunHooksAsync] = runHooksAsync
-
   this._onClose((ins, done) => {
     runHooks('onClose', ins, done)
   })
   this.addHook('onError', printError)
 }
 
+function throwError (ins, e) {
+  runHooks('onError', ins, null, e)
+}
+
+function onRouteFlow (next) {
+  const { $beanify } = this
+  runHooksAsync('onRoute', $beanify, this)
+    .then(() => next())
+    .catch(e => next(e))
+}
+
+function onBeforeInjectFlow (next) {
+  const { url } = this
+  const beginTime = Date.now()
+  this.$log.debug(`inject begin(${beginTime}): ${url}`)
+  this[kInjectTime] = beginTime
+  runHooksAsync('onBeforeInject', this)
+    .then(() => next())
+    .catch(e => next(e))
+}
+
+function onAfterInjectFlow (next) {
+  runHooksAsync('onAfterInject', this)
+    .then(() => next())
+    .catch(e => next(e))
+    .finally(() => {
+      const { url } = this
+      const btime = this[kInjectTime]
+      const etime = Date.now()
+      this.$log.debug(`inject finish(${etime}): ${url}`)
+      this.$log.info(`inject duration(${(etime - btime) / 1000}ms): ${url}`)
+    })
+}
+
+function onBeforeHandlerFlow (next) {
+  const { url } = this
+  const req = this[kRouteRequest]
+  const rep = this[kRouteReply]
+  const beginTime = Date.now()
+  this.$log.debug(`request incomming(${beginTime}): ${url}`)
+  this[kRouteTime] = beginTime
+  runHooksAsync('onBeforeHandler', this, req, rep)
+    .then(() => next())
+    .catch(e => next(e))
+}
+
+function onAfterHandlerFlow (next) {
+  const req = this[kRouteRequest]
+  const rep = this[kRouteReply]
+  const { url } = this
+  runHooksAsync('onAfterHandler', this, req, rep)
+    .then(() => {
+      rep[kReplySent] = true
+      replySending.call(rep, rep[kReplyTo], {
+        data: rep.$data,
+        attrs: this.$attribute
+      })
+    })
+    .catch(e => next(e))
+    .finally(() => {
+      const btime = this[kRouteTime]
+      const etime = Date.now()
+      this.$log.debug(`request completed(${etime}): ${url}`)
+      this.$log.info(`request duration(${(etime - btime) / 1000}ms):${url}`)
+    })
+}
+
 module.exports = {
   initHooks,
   routeHooks,
-  injectHooks
+  injectHooks,
+  throwError,
+  onRouteFlow,
+  onBeforeInjectFlow,
+  onAfterInjectFlow,
+  onBeforeHandlerFlow,
+  onAfterHandlerFlow
 }
