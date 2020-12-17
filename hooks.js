@@ -8,8 +8,7 @@ const {
   kRouteTime,
   kRouteRequest,
   kRouteReply,
-  kReplySent,
-  kReplyTo
+  kReplySent
 } = require('./symbols')
 
 const hooks = {
@@ -174,7 +173,7 @@ function onAfterHandlerFlow (next) {
   runHooksAsync('onAfterHandler', this, req, rep)
     .then(() => {
       rep[kReplySent] = true
-      replySending.call(rep, rep[kReplyTo], {
+      replySending.call(rep, {
         data: rep.$data,
         attrs: this.$attribute
       })

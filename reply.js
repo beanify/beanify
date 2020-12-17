@@ -6,10 +6,17 @@ const {
   kReplyFlag
 } = require('./symbols')
 
-function replySending (url, payload) {
+function replySending (payload) {
+  const url = this[kReplyTo]
   const {
-    $beanify: { $nats }
+    $beanify: { $nats },
+    $pubsub
   } = this[kReplyRoute]
+
+  if ($pubsub || !url) {
+    return
+  }
+
   $nats.publish(url, payload)
 }
 
@@ -24,22 +31,16 @@ Reply.prototype.error = function (err) {
 
   this[kReplySent] = true
   const route = this[kReplyRoute]
-  const url = this[kReplyTo]
   const {
-    $beanify: { $errio },
-    $pubsub
+    $beanify: { $errio }
   } = route
-
-  if ($pubsub) {
-    return
-  }
 
   const errMsg = $errio.toObject(err)
   const payload = {
     attrs: route.$attribute,
     err: errMsg
   }
-  replySending.call(this, url, payload)
+  replySending.call(this, payload)
 }
 
 Reply.prototype.send = function (data) {

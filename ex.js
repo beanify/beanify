@@ -24,6 +24,21 @@ beanify
         // throw new Error('message from onAfterHandler')
       }
     })
+    ins.route({
+      url: 'math.sub',
+      handler (req, rep) {
+        rep.send(req.body)
+        this.$attribute.val = req.body
+        // this.$attribute.p1.v1 = 'pppppp'
+        // throw new Error('message from handler')
+      },
+      onBeforeHandler (req, rep) {
+        // throw new Error('message from onBeforeHandler')
+      },
+      onAfterHandler (req, rep) {
+        // throw new Error('message from onAfterHandler')
+      }
+    })
   })
   .ready(async () => {
     beanify.inject({
@@ -49,6 +64,7 @@ beanify
           d1,
           d2
         })
+        beanify.print()
       }
       // onBeforeInject () {},
       // onAfterInject () {}
