@@ -62,11 +62,24 @@ function beanifyPlugin (fn, opts) {
 }
 
 beanify
+  .route({
+    url: 'math.add.v0',
+    handler () {}
+  })
   .register(
     beanifyPlugin(
       (i1, opts, done) => {
         // console.log(i1)
         i1.decorate('aaaa', '123123')
+        i1.route({
+          url: 'math.add.i1',
+          handler () {}
+        })
+        i1.route({
+          url: 'math.add.i2',
+          handler () {}
+        })
+
         // i1.route()
         i1.register(
           beanifyPlugin(
@@ -109,6 +122,11 @@ beanify
               console.log({
                 i5: i5.hasDecorator('aaaa')
               })
+              i5.route({
+                url: 'math.add.i5',
+                $usePrefix: false,
+                handler () {}
+              })
               // i4.route()
               done()
             },
@@ -132,8 +150,7 @@ beanify
         // console.log(i2)
         i2.route({
           url: 'math.add',
-          handler () {},
-          onRoute () {}
+          handler () {}
         })
         console.log({
           i2: i2.hasDecorator('aaaa')
@@ -148,5 +165,5 @@ beanify
   )
   .ready(e => {
     console.log(e && e.message)
-    beanify.printTree()
+    beanify.print()
   })

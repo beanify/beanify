@@ -2,7 +2,6 @@ const {
   kBeanifyRoot,
   kBeanifyOptions,
   kBeanifyVersion,
-  kBeanifyPlugins,
   kBeanifyAvvio,
   kBeanifyName,
   kInjectParent,
@@ -32,7 +31,6 @@ module.exports = {
       $options: kBeanifyOptions,
       $version: kBeanifyVersion,
       $avvio: kBeanifyAvvio,
-      $plugins: kBeanifyPlugins,
       $name: kBeanifyName
     }
     initProperties.call(this, props)

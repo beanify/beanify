@@ -68,5 +68,5 @@ export interface Beanify {
     handler?: ROTR.InjectHandler<ROTR.Inject>
   ): Beanify | Promise<Record<string, unknown>>
 
-  printTree(): void
+  print(): void
 }

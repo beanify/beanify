@@ -1,6 +1,7 @@
 const {
+  kQueueRoutes,
+  kQueueInjects,
   kBeanifyRoutes,
-  kBeanifyInjects,
   kBeanifyChildren,
   kBeanifyRouterPrefix,
   kRouteBeanify,
@@ -332,18 +333,18 @@ function attachAvvio () {
   $avvio._readyQ.unshift(async () => {
     $avvio._readyQ.pause()
     $log.info('register routes')
-    await activeQueue.call(this.$root, kBeanifyRoutes)
-    await activeQueue.call(this.$root, kBeanifyInjects)
+    await activeQueue.call(this.$root, kQueueRoutes)
+    await activeQueue.call(this.$root, kQueueInjects)
     $avvio._readyQ.resume()
   })
 }
 
 function initQueue () {
-  this[kBeanifyRoutes] = FastQ(this, routerWorker, 1)
-  this[kBeanifyRoutes].pause()
+  this[kQueueRoutes] = FastQ(this, routerWorker, 1)
+  this[kQueueRoutes].pause()
 
-  this[kBeanifyInjects] = FastQ(this, injectWorker, 1)
-  this[kBeanifyInjects].pause()
+  this[kQueueInjects] = FastQ(this, injectWorker, 1)
+  this[kQueueInjects].pause()
 }
 
 function addRoute (opts, handler) {
@@ -404,7 +405,8 @@ function addRoute (opts, handler) {
     }
   }
 
-  this[kBeanifyRoutes].push(route)
+  this[kBeanifyRoutes].push(route.url)
+  this[kQueueRoutes].push(route)
 }
 
 function addInject (opts, handler, parent) {
@@ -486,7 +488,7 @@ function addInject (opts, handler, parent) {
   }
 
   inject.handler = inject.handler.bind(inject)
-  this[kBeanifyInjects].push(inject)
+  this[kQueueInjects].push(inject)
   return returned
 }
 

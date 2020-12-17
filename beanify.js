@@ -6,7 +6,7 @@ const {
   kBeanifyRouterPrefix,
   kBeanifyVersion,
   kBeanifyChildren,
-  kBeanifyPlugins,
+  kBeanifyRoutes,
   kBeanifyAvvio,
   kBeanifyName
 } = require('./symbols')
@@ -20,9 +20,7 @@ const { initQueue, addRoute, addInject, attachAvvio } = require('./queue')
 const { initHooks } = require('./hooks')
 const { initBeanifyProperties } = require('./properties')
 
-const nuid = require('nuid')
 const avvioOverride = require('./override')
-const printTree = require('./print-tree')
 
 function Beanify (opts) {
   // new instace
@@ -31,12 +29,12 @@ function Beanify (opts) {
   }
 
   this[kBeanifyRoot] = this
-  this[kBeanifyName] = nuid.next()
+  this[kBeanifyName] = 'root'
   this[kBeanifyOptions] = beanifyOptions(opts)
   this[kBeanifyRouterPrefix] = opts.router.prefix
   this[kBeanifyVersion] = require('./package.json').version
   this[kBeanifyChildren] = []
-  this[kBeanifyPlugins] = []
+  this[kBeanifyRoutes] = []
   this[kBeanifyAvvio] = AVVIO(this, {
     expose: {
       use: 'register',
@@ -76,20 +74,57 @@ Beanify.prototype.inject = function (opts, handler) {
   return addInject.call(this, opts || {}, handler)
 }
 
-Beanify.prototype.printTree = function () {
-  this.$log.info('----------printTree----------')
-  printTree({
-    ins: this,
-    key: kBeanifyChildren,
-    format: (pad, ins) => {
-      this.$log.info(`${pad}${ins.$name}`)
-      const plns = ins.$plugins
-      const pPad = pad.padEnd(pad.length + 2, '-')
-      for (const pln of plns) {
-        this.$log.info(`${pPad}[${pln}]`)
+Beanify.prototype.print = function () {
+  const tab = 4
+  const tabPad = '|'.padEnd(tab, ' ')
+  const tabPrefix = '|'.padEnd(tab, '-')
+
+  function printRoutes (level, child) {
+    const routes = child[kBeanifyRoutes]
+    if (routes.length > 0) {
+      const rPad = ''.padEnd((level + 1) * tab, tabPad)
+      const rLine = `${rPad}${tabPrefix}routes`
+      child.$log.info(rLine)
+
+      for (const url of routes) {
+        const uPad = ''.padEnd(rPad.length + tab, tabPad)
+        const uLine = `${uPad}${tabPrefix}${url}`
+        child.$log.info(uLine)
       }
     }
-  })
+  }
+
+  function printPrefix (level, child) {
+    const prefix = child[kBeanifyRouterPrefix]
+    if (prefix && prefix !== '') {
+      const pPad = ''.padEnd((level + 1) * tab, tabPad)
+      const pLine = `${pPad}${tabPrefix}prefix`
+      child.$log.info(pLine)
+
+      const uPad = ''.padEnd(pPad.length + tab, tabPad)
+      const uLine = `${uPad}${tabPrefix}${prefix}`
+      child.$log.info(uLine)
+    }
+  }
+
+  function printChild (level, child) {
+    const nPad = ''.padEnd(level * tab, tabPad)
+    if (level === 0) {
+      child.$log.info(`${nPad}[${child.$name}]`)
+    } else {
+      child.$log.info(`${nPad}${tabPrefix}[${child.$name}]`)
+    }
+
+    printRoutes(level, child)
+    printPrefix(level, child)
+
+    const children = child[kBeanifyChildren]
+    children.forEach(child => {
+      printChild(level + 1, child)
+    })
+  }
+
+  printChild(0, this)
 }
 
 module.exports = Beanify

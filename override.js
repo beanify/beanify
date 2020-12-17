@@ -1,13 +1,12 @@
 const {
   kBeanifyPluginMeta,
-  kBeanifyPlugins,
+  kBeanifyRoutes,
   kBeanifyChildren,
   kBeanifyName,
   kBeanifyRouterPrefix
 } = require('./symbols')
 const { PluginVersioMismatchError } = require('./errors')
 const { initQueue } = require('./queue')
-const nuid = require('nuid')
 const semver = require('semver')
 
 module.exports = function avvioOverride (old, fn, opts) {
@@ -23,13 +22,8 @@ module.exports = function avvioOverride (old, fn, opts) {
     throw new PluginVersioMismatchError(meta.name, meta.beanify, old.$version)
   }
 
-  if (meta.name) {
-    // push name
-    old[kBeanifyPlugins].push(meta.name)
-  }
-
   // is scoped
-  if (meta.scoped === true) {
+  if (!meta.name) {
     return old
   }
 
@@ -42,9 +36,9 @@ module.exports = function avvioOverride (old, fn, opts) {
   const ins = Object.create(old)
   old[kBeanifyChildren].push(ins)
 
-  ins[kBeanifyName] = nuid.next()
+  ins[kBeanifyName] = meta.name
   ins[kBeanifyChildren] = []
-  ins[kBeanifyPlugins] = []
+  ins[kBeanifyRoutes] = []
   ins[kBeanifyRouterPrefix] = buildRouterPrefix(
     old[kBeanifyRouterPrefix],
     prefix
