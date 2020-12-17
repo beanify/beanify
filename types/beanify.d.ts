@@ -39,10 +39,13 @@ export interface Beanify {
   $options: BeanifyOptions
   $root: Beanify
   $version: string
-  $plugins: string[]
   $avvio: AVIO.Avvio<Beanify>
+
+  // decorates
   $log: PINO.Logger
   $errio: ERRI.Errio
+
+  // plugins
   $nats: NATS.Client
 
   decorate(prop: string, value: any): Beanify
@@ -66,7 +69,7 @@ export interface Beanify {
   inject(
     opts: ROTR.Inject,
     handler?: ROTR.InjectHandler<ROTR.Inject>
-  ): Beanify | Promise<Record<string, unknown>>
+  ): Beanify | Promise<any>
 
   print(): void
 }

@@ -27,11 +27,11 @@ function initProperties (props) {
 module.exports = {
   initBeanifyProperties () {
     const props = {
-      $root: kBeanifyRoot,
+      $name: kBeanifyName,
       $options: kBeanifyOptions,
+      $root: kBeanifyRoot,
       $version: kBeanifyVersion,
-      $avvio: kBeanifyAvvio,
-      $name: kBeanifyName
+      $avvio: kBeanifyAvvio
     }
     initProperties.call(this, props)
   },

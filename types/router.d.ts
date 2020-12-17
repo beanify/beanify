@@ -18,7 +18,8 @@ export interface Reply {
 
   // properties
   $data: readonly any
-  $sent: boolean
+  $sent: readonly boolean
+  $log: readonly PINO.Logger
 }
 
 export type InjectHandler<S> = (
@@ -67,7 +68,7 @@ export interface Route {
   // properties
   $beanify: readonly Beanify
   $attribute: readonly Record<string, unknown>
-  $log: PINO.Logger
+  $log: readonly PINO.Logger
 
   // hooks
   onError?: HOOK.OnErrorCallback
@@ -91,7 +92,7 @@ export interface Inject {
   $beanify: readonly Beanify
   $attribute: readonly Record<string, unknown>
   $context: readonly Record<string, unknown>
-  $log: PINO.Logger
+  $log: readonly PINO.Logger
 
   // hooks
   onError?: HOOK.OnErrorCallback
