@@ -83,31 +83,16 @@ Beanify.prototype.print = function () {
   const tabPad = '|'.padEnd(tab, ' ')
   const tabPrefix = '|'.padEnd(tab, '-')
 
-  function printRoutes (level, child) {
-    const routes = child[kBeanifyRoutes]
-    if (routes.length > 0) {
+  function printArrays (level, child, key, name) {
+    const items = child[key]
+    if (items.length > 0) {
       const rPad = ''.padEnd((level + 1) * tab, tabPad)
-      const rLine = `${rPad}${tabPrefix}routes`
+      const rLine = `${rPad}${tabPrefix}${name}`
       child.$log.info(rLine)
 
-      for (const url of routes) {
+      for (const url of items) {
         const uPad = ''.padEnd(rPad.length + tab, tabPad)
         const uLine = `${uPad}${tabPrefix}${url}`
-        child.$log.info(uLine)
-      }
-    }
-  }
-
-  function printDecorates (level, child) {
-    const decorates = child[kBeanifyDecorates]
-    if (decorates.length > 0) {
-      const rPad = ''.padEnd((level + 1) * tab, tabPad)
-      const rLine = `${rPad}${tabPrefix}decorates`
-      child.$log.info(rLine)
-
-      for (const name of decorates) {
-        const uPad = ''.padEnd(rPad.length + tab, tabPad)
-        const uLine = `${uPad}${tabPrefix}${name}`
         child.$log.info(uLine)
       }
     }
@@ -133,9 +118,8 @@ Beanify.prototype.print = function () {
     } else {
       child.$log.info(`${nPad}${tabPrefix}[${child.$name}]`)
     }
-
-    printRoutes(level, child)
-    printDecorates(level, child)
+    printArrays(level, child, kBeanifyRoutes, 'routes')
+    printArrays(level, child, kBeanifyDecorates, 'decorates')
     printPrefix(level, child)
 
     const children = child[kBeanifyChildren]

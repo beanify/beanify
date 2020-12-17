@@ -8,5 +8,5 @@ module.exports = function () {
     this.$log.debug(`$errio.register: ${en}`)
     Errio.register(errors[en])
   }
-  this.decorate('$errio', Errio)
+  this.$errio = Errio
 }
