@@ -112,7 +112,7 @@ function runHooksAsync (name, ins, ...args) {
 
 function initHooks () {
   this.$log.info('decorate addHook')
-  this.decorate('addHook', addHook.bind(this))
+  this.addHook = addHook.bind(this)
 
   this._onClose((ins, done) => {
     runHooks('onClose', ins, done)

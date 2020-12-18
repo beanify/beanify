@@ -35,7 +35,7 @@ Node.js v10 LTS (10.16.0) or later.
 - BEANIFY_NATS_PASS: NATS authentication password
 - BEANIFY_NATS_TOKEN: NATS authentication token
 - BEANIFY_PINO_LEVEL: Log level
-- BEANIFY_PINO_PERTTY: The log is output in pretty style
+- BEANIFY_PINO_PRETTY: The log is output in pretty style
 - BEANIFY_ROUTER_PREFIX: Global URL prefix
 
 ## Install

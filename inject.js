@@ -82,7 +82,7 @@ function injectRequestFlow (next) {
 
         this[kInjectAttribute] = cattrs
         if (reply.err) {
-          const { $errio } = this
+          const { $errio } = this.$beanify
           const e = $errio.fromObject(reply.err)
           return await this.handler(e)
         } else {

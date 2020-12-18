@@ -31,5 +31,5 @@ module.exports = function (ins, opts, done) {
     nats.close()
   })
 
-  ins.decorate('$nats', nats)
+  ins.$nats = nats
 }
