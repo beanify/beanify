@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "properties": {
+    "BEANIFY_NATS_URL": { "type": "string" },
+    "BEANIFY_NATS_SERVERS": { "type": "string", "separator": "," },
+    "BEANIFY_NATS_USER": { "type": "string" },
+    "BEANIFY_NATS_PASS": { "type": "string" },
+    "BEANIFY_NATS_TOKEN": { "type": "string" },
+    "BEANIFY_PINO_LEVEL": {
+      "enum": ["fatal", "error", "warn", "info", "debug", "trace", "silent"],
+      "default": "info"
+    },
+    "BEANIFY_PINO_PRETTY": { "type": "boolean", "default": false },
+    "BEANIFY_ROUTER_PREFIX": { "type": "string", "default": "" }
+  }
+}

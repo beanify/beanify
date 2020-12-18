@@ -1,34 +1,36 @@
 const NATS = require('nats')
+const { kBeanifyNats } = require('../symbols')
 
-const connCodes = ['CONN_ERR', NATS.SECURE_CONN_REQ, NATS.NON_SECURE_CONN_REQ, NATS.CLIENT_CERT_REQ]
+const natsErrorCodes = [
+  NATS.CONN_ERR,
+  NATS.SECURE_CONN_REQ,
+  NATS.NON_SECURE_CONN_REQ,
+  NATS.CLIENT_CERT_REQ
+]
 
-module.exports = (beanify, opts, done) => {
-
-  const {$log:log}=beanify
+module.exports = function (ins, opts, done) {
+  ins.$log.info('decorate $nats')
 
   const nats = NATS.connect(opts)
 
   nats.on('connect', () => {
-    log.info('NATS Connected!')
+    ins.$log.debug('$nats connected!')
     done()
   })
 
-  nats.on('error', (err) => {
-    log.error(err,'Could not connect to NATS!')
-    log.error("NATS Code: '%s', Message: %s", err.code, err.message)
-
+  nats.on('error', err => {
+    ins.$log.error('$nats error!')
+    ins.$log.error(`$nats code: ${err.code} , message:${err.message}`)
     done(err)
 
-    if (connCodes.indexOf(err.code) > -1) {
-      beanify.close()
+    if (natsErrorCodes.indexOf(err.code) > -1) {
+      ins.close()
     }
   })
 
-  beanify.onClose((instance, done) => {
+  ins.addHook('onClose', function () {
     nats.close()
-    done()
   })
 
-  beanify.decorate('$nats',nats)
-
+  ins[kBeanifyNats] = nats
 }

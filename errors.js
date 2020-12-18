@@ -1,19 +1,44 @@
-const SuperError = require('super-error')
+const superError = require('super-error')
 
-const BeanifyError = SuperError.subclass('BeanifyError')
-const SchemaError = BeanifyError.subclass('SchemaError')
-const TimeoutError = BeanifyError.subclass('TimeoutError')
-const ResponseError = BeanifyError.subclass('ResponseError')
-const PatternNotFound = BeanifyError.subclass('PatternNotFound')
-const MaxRecursionError = BeanifyError.subclass('MaxRecursionError')
-const ProcessLoadError = BeanifyError.subclass('ProcessLoadError')
+const BeanifyError = superError.subclass('BeanifyError')
+const DecorateExistsError = BeanifyError.subclass(
+  'DecorateExistsError',
+  function () {
+    this.message = 'Decoration has been already added'
+  }
+)
+
+const PluginVersioMismatchError = BeanifyError.subclass(
+  'PluginVersioMismatchError',
+  function (name, expected, installed) {
+    this.message = `beanify-plugin: ${name} - expected '${expected}' beanify version, '${installed}' is installed`
+  }
+)
+
+const RouteOptionsError = BeanifyError.subclass('RouteOptionsError')
+
+const InjectOptionsError = BeanifyError.subclass('InjectOptionsError')
+
+const InjectTimeoutError = BeanifyError.subclass(
+  'InjectTimeoutError',
+  function (url) {
+    this.message = `inject timeout: ${url}`
+  }
+)
+
+const HookCallbackError = BeanifyError.subclass(
+  'HookCallbackError',
+  function () {
+    this.message = 'hook callback not allow arrow function'
+  }
+)
 
 module.exports = {
   BeanifyError,
-  MaxRecursionError,
-  SchemaError,
-  TimeoutError,
-  ResponseError,
-  PatternNotFound,
-  ProcessLoadError
+  DecorateExistsError,
+  PluginVersioMismatchError,
+  RouteOptionsError,
+  InjectOptionsError,
+  InjectTimeoutError,
+  HookCallbackError
 }
