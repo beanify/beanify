@@ -26,6 +26,7 @@ const {
 const { Route, registerRouteFlow, doRouteHandlerFlow } = require('./route')
 const { Inject, injectRequestFlow } = require('./inject')
 
+const Clone = require('clone')
 const FastQ = require('fastq')
 const AJV = require('ajv')
 const Merge = require('merge')
@@ -82,8 +83,8 @@ function requestComing (payload, replyTo, url) {
   route.handler = this.handler.bind(route)
 
   const nattrs = payload.attrs || {}
-  const oattrs = this[kRouteAttribute]
-  const cattrs = Merge.recursive(nattrs, oattrs)
+  const oattrs = Clone(this[kRouteAttribute])
+  const cattrs = Merge.recursive(oattrs, nattrs)
 
   const req = new Request()
   req[kRequestRoute] = route

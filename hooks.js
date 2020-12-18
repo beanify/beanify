@@ -150,7 +150,7 @@ function onAfterInjectFlow (next) {
       const btime = this[kInjectTime]
       const etime = Date.now()
       this.$log.debug(`inject finish(${etime}): ${url}`)
-      this.$log.info(`inject duration(${(etime - btime) / 1000}ms): ${url}`)
+      this.$log.info(`inject duration(${etime - btime}ms): ${url}`)
     })
 }
 
@@ -183,7 +183,7 @@ function onAfterHandlerFlow (next) {
       const btime = this[kRouteTime]
       const etime = Date.now()
       this.$log.debug(`request completed(${etime}): ${url}`)
-      this.$log.info(`request duration(${(etime - btime) / 1000}ms):${url}`)
+      this.$log.info(`request duration(${etime - btime}ms):${url}`)
     })
 }
 

@@ -35,14 +35,14 @@ export interface BeanifyClose<I> {
 }
 
 export interface Beanify {
-  $name: readonly string
-  $options: BeanifyOptions
-  $root: Beanify
-  $version: string
-  $avvio: AVIO.Avvio<Beanify>
-  $log: PINO.Logger
-  $errio: ERRI.Errio
-  $nats: NATS.Client
+  $name: Readonly<string>
+  $options: Readonly<BeanifyOptions>
+  $root: Readonly<Beanify>
+  $version: Readonly<string>
+  $avvio: Readonly<AVIO.Avvio<Beanify>>
+  $log: Readonly<PINO.Logger>
+  $errio: Readonly<ERRI.Errio>
+  $nats: Readonly<NATS.Client>
 
   decorate(prop: string, value: any): Beanify
   hasDecorator(prop: string): boolean

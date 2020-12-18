@@ -1,4 +1,5 @@
 const NATS = require('nats')
+const { kBeanifyNats } = require('../symbols')
 
 const natsErrorCodes = [
   NATS.CONN_ERR,
@@ -31,5 +32,5 @@ module.exports = function (ins, opts, done) {
     nats.close()
   })
 
-  ins.$nats = nats
+  ins[kBeanifyNats] = nats
 }

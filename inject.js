@@ -78,7 +78,7 @@ function injectRequestFlow (next) {
       .then(async reply => {
         const nattrs = reply.attrs || {}
         const oattrs = this.$attribute
-        const cattrs = Merge.recursive(nattrs, oattrs)
+        const cattrs = Merge.recursive(oattrs, nattrs)
 
         this[kInjectAttribute] = cattrs
         if (reply.err) {

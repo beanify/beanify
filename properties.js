@@ -3,6 +3,9 @@ const {
   kBeanifyOptions,
   kBeanifyVersion,
   kBeanifyAvvio,
+  kBeanifyErrio,
+  kBeanifyPino,
+  kBeanifyNats,
   kBeanifyName,
   kInjectParent,
   kInjectBeanify,
@@ -31,7 +34,10 @@ module.exports = {
       $options: kBeanifyOptions,
       $root: kBeanifyRoot,
       $version: kBeanifyVersion,
-      $avvio: kBeanifyAvvio
+      $avvio: kBeanifyAvvio,
+      $log: kBeanifyPino,
+      $errio: kBeanifyErrio,
+      $nats: kBeanifyNats
     }
     initProperties.call(this, props)
   },

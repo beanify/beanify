@@ -38,6 +38,7 @@
     "ajv": "^6.10.2",
     "async": "^3.2.0",
     "avvio": "^6.2.2",
+    "clone": "^2.1.2",
     "env-schema": "^1.1.0",
     "errio": "^1.2.2",
     "extra-function": "^0.0.50",
@@ -48,5 +49,7 @@
     "semver": "^7.3.4",
     "super-error": "^2.4.0"
   },
-  "pre-commit": ["lint"]
+  "pre-commit": [
+    "lint"
+  ]
 }
