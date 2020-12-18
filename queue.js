@@ -241,9 +241,10 @@ function addInject (opts, handler, parent) {
   initInjectProperties.call(inject)
 
   if (parent instanceof Inject) {
-    if (!inject[kInjectContext]) {
-      inject[kInjectContext] = parent[kInjectContext]
-    }
+    const cCxt = inject[kInjectContext] || {}
+    const pCxt = Clone(parent[kInjectContext] || {})
+    Merge.recursive(pCxt, cCxt)
+    inject[kInjectContext] = pCxt
   }
 
   if (typeof inject.handler !== 'function') {

@@ -137,6 +137,10 @@ beanify
 - [Decorators](./docs/Decorators.md)
 - [Plugins](./docs/Plugins.md)
 - [Hooks](./docs/Hooks.md)
+- [Route](./docs/Route.md)
+- [Inject](./docs/Inject.md)
+- [Request](./docs/Request.md)
+- [Reply](./docs/Reply.md)
 - [Beanify](./docs/Beanify.md)
 
 <!-- - [Request and Reply](./docs/request-and-reply.md)

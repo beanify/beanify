@@ -62,11 +62,11 @@ Function useful if you need to decorate the beanify instance.check [here](./Deco
 
 ### `hasDecorator`
 
-check [here](./Decorators.md#Usage)
+Used to check for the existence of a instance decoration.check [here](./Decorators.md#Usage)
 
 ### `register`
 
-Beanify allows the user to extend its functionality with plugins. A plugin can be a set of routes, a server decorator or whatever, check [here](./Plugins.md).
+Beanify allows the user to extend its functionality with plugins. A plugin can be a set of routes, a instance decorator or whatever, check [here](./Plugins.md).
 
 ### `after`
 
@@ -110,7 +110,7 @@ beanify.ready().then(
 
 ### `close`
 
-call this function to close the server instance and run the `onClose` hook
+call this function to close the instance and run the `onClose` hook
 
 ```javascript
 beanify.close().then(
@@ -125,4 +125,16 @@ beanify.close().then(
 
 ### `addHook`
 
-Function to add a specific hook in the lifecycle of Beanify, check [here](./Hooks.md).
+Method to add a specific hook in the lifecycle of Beanify, check [here](./Hooks.md).
+
+### `route`
+
+Method to add routes to the instance, check [here](./Route.md).
+
+### `inject`
+
+Start a new request.check [here](./Inject.md)
+
+### `print`
+
+Print the context tree and routes,decorates,prefix in the context
