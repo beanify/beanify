@@ -22,12 +22,12 @@ yarn add beanify
 
 ## Your first microservice
 
-Let's write our first server:
+Let's write our first microservice:
 
 ```javascript
 const beanify = require('beanify')({
   nats: {
-    url: 'nats://localhost:4244'
+    url: 'nats://localhost:4222'
   },
   pino: {
     level: 'debug',
@@ -69,7 +69,7 @@ Do you prefer to use async/await? Beanify supports it out-of-the-box.
 ```javascript
 const beanify = require('beanify')({
   nats: {
-    url: 'nats://localhost:4244'
+    url: 'nats://localhost:4222'
   },
   pino: {
     level: 'debug',
@@ -110,13 +110,13 @@ Beanify offers an easy platform that helps to solve all of the problems outlined
 
 ## Your first plugin
 
-Like JavaScript, everything is an object, while in beanify, with the help of avvio, everything is a plug-in. Before we dive into it, let's see how it works! Let's declare our basic server, but not within the entry point, but in an external file
+Like JavaScript, everything is an object, while in beanify, with the help of avvio, everything is a plug-in. Before we dive into it, let's see how it works! Let's declare our basic instance, but not within the entry point, but in an external file
 
 ```javascript
 // index.js
 const beanify = require('beanify')({
   nats: {
-    url: 'nats://localhost:4244'
+    url: 'nats://localhost:4222'
   },
   pino: {
     level: 'debug',
@@ -157,4 +157,4 @@ module.exports = function (beanify, opts, done) {
 }
 ```
 
-In this example, we used the **register** API, which is the core of the Beanify framework. It is the only way to add services, plugins, et cetera.
+In this example, we used the [register](./Plugins.md) API, which is the core of the Beanify framework. It is the only way to add services, plugins, et cetera.

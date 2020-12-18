@@ -9,11 +9,9 @@ A fundamental feature of Beanify is the "encapsulation context.".A visual repres
 In the above figure, there are several entities:
 
 1. The _root context_
-2. Three _root plugins_
-3. Two _child contexts_ where each _child context_ has
-   - Two _child plugins_
-   - One _grandchild context_ where each _grandchild context_ has
-     - Three _child plugins_
+2. Three _child contexts_
+3. Three _child contexts_ where each _child context_ has
+   - Three _grandchild contexts_
 
 Every child context and grandchild context has access to the root plugins. Within each child context the granchild contexts have access to the child plugins registered within the containing child context, but the containing child context does not have access to the child plugins registered within its grandchild context.
 
@@ -31,14 +29,14 @@ beanify
           console.log('c3dec:' + c2.hasDecorator('c3dec')) // false
           console.log('rootdec:' + c2.hasDecorator('rootdec')) // true
         },
-        { name: 'c2' }
+        { name: 'c2' } // new scope
       )
       console.log('c2dec:' + c1.hasDecorator('c2dec')) // false
       console.log('c1dec:' + c1.hasDecorator('c1dec')) // true
       console.log('c3dec:' + c1.hasDecorator('c3dec')) // false
       console.log('rootdec:' + c1.hasDecorator('rootdec')) // true
     },
-    { name: 'c1' }
+    { name: 'c1' } // new scope
   )
   .register(
     async c3 => {
@@ -48,6 +46,6 @@ beanify
       console.log('c3dec:' + c3.hasDecorator('c3dec')) // true
       console.log('rootdec:' + c3.hasDecorator('rootdec')) // true
     },
-    { name: 'c3' }
+    { name: 'c3' } // new scope
   )
 ```

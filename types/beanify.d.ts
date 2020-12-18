@@ -35,17 +35,13 @@ export interface BeanifyClose<I> {
 }
 
 export interface Beanify {
-  $name: string
+  $name: readonly string
   $options: BeanifyOptions
   $root: Beanify
   $version: string
   $avvio: AVIO.Avvio<Beanify>
-
-  // decorates
   $log: PINO.Logger
   $errio: ERRI.Errio
-
-  // plugins
   $nats: NATS.Client
 
   decorate(prop: string, value: any): Beanify

@@ -2,7 +2,7 @@
 
 ## Decorators
 
-The decorators API can be used to attach any type of property to the core objects, e.g. functions, plain objects, or native types.
+The decorators API can be used to attach any type of property to the instance, e.g. functions, plain objects, or native types.
 
 This API is a _synchronous_ API. Attempting to define a decoration asynchronously could result in the Beanify instance booting prior to the decoration completing its initialization. To avoid this issue, and register an asynchronous decoration, the register API, in combination with [plugin](./Plugins.md#Usage), must be used instead.
 
@@ -38,7 +38,7 @@ console.log(beanify.conf.db)
 
 ### `hasDecorator(name)`
 
-Used to check for the existence of a server instance decoration:
+Used to check for the existence of a instance decoration:
 
 ```javascript
 beanify.hasDecorator('utility')

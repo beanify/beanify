@@ -2,7 +2,7 @@
 
 ## Factory
 
-The Beanify module exports a factory function that is used to create new Beanify server instances. This factory function accepts an options object which is used to customize the resulting instance. This document describes the properties available in that options object.
+The Beanify module exports a factory function that is used to create new Beanify instances. This factory function accepts an options object which is used to customize the resulting instance. This document describes the properties available in that options object.
 
 ### `nats`
 
@@ -18,25 +18,57 @@ This property is used to configure the internal `$errio` instance.check [here](h
 
 ### `router`
 
-- **prefix**:Global URL prefix
+- **prefix**: the root context `route` prefix
 
-## Instance
+## Instance Properties
 
-### Server Methods
+### `$name` readonly
 
-`decorate`
+The name of context
+
+### `$options` readonly
+
+the config of root context
+
+### `$root` readonly
+
+the root context
+
+### `$version` readonly
+
+the version of beanify library
+
+### `$avvio` readonly
+
+the avvio instance. check [here](https://github.com/fastify/avvio#api)
+
+### `$log` readonly
+
+the logger instance. check [here](https://github.com/pinojs/pino/blob/master/docs/api.md#logger)
+
+### `$errio` readonly
+
+the errio instace. check [here](https://github.com/causal-agent/errio#api-documentation)
+
+### `$nats` readonly
+
+the nats instace. check [here](https://github.com/nats-io/nats.js#basic-usage)
+
+## Instance Methods
+
+### `decorate`
 
 Function useful if you need to decorate the beanify instance.check [here](./Decorators.md#Usage)
 
-`hasDecorator`
+### `hasDecorator`
 
 check [here](./Decorators.md#Usage)
 
-`register`
+### `register`
 
 Beanify allows the user to extend its functionality with plugins. A plugin can be a set of routes, a server decorator or whatever, check [here](./Plugins.md).
 
-`after`
+### `after`
 
 Invoked when the current plugin and all the plugins that have been registered within it have finished loading. It is always executed before the method beanify.ready
 
@@ -61,7 +93,7 @@ beanify
 // Everything has been loaded
 ```
 
-`ready`
+### `ready`
 
 Function called when all the plugins have been loaded. It takes an error parameter if something went wrong.
 
@@ -76,7 +108,7 @@ beanify.ready().then(
 )
 ```
 
-`close`
+### `close`
 
 call this function to close the server instance and run the `onClose` hook
 
@@ -91,6 +123,6 @@ beanify.close().then(
 )
 ```
 
-`addHook`
+### `addHook`
 
 Function to add a specific hook in the lifecycle of Beanify, check [here](./Hooks.md).

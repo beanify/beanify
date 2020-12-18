@@ -2,7 +2,7 @@
 
 ## Plugins
 
-Beanify allows the user to extend its functionalities with plugins. A plugin can be a set of routes, a server decorator or whatever. The API that you will need to use one or more plugins, is register.
+Beanify allows the user to extend its functionalities with plugins. A plugin can be a set of routes, a instance decorator or whatever. The API that you will need to use one or more plugins, is register.
 
 when you set plugin `name`, register creates a new scope, this means that if you do some changes to the Beanify instance (via decorate), this change will not be reflected to the current context ancestors, but only to its sons. This feature allows us to achieve plugin encapsulation and inheritance, in this way we create a direct acyclic graph (DAG) and we will not have issues caused by cross dependencies.
 
@@ -14,7 +14,7 @@ beanify.register(plugin, options)
 
 ## Plugin Options
 
-- **name**: Beanify uses this option to print scope graph.when you set value, register creates a new scope
+- **name**: when you set value, register creates a new scope.
 - **prefix**: the new scope `route` prefix.The prefix of the parent will be inherited
 - **beanify**: Used to detect the current beanify version
 

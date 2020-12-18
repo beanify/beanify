@@ -137,7 +137,7 @@ beanify
 - [Decorators](./docs/Decorators.md)
 - [Plugins](./docs/Plugins.md)
 - [Hooks](./docs/Hooks.md)
-- [Server](./docs/Server.md)
+- [Beanify](./docs/Beanify.md)
 
 <!-- - [Request and Reply](./docs/request-and-reply.md)
 - [Publish and Subscribe](./docs/publish-and-subscribe.md) -->
