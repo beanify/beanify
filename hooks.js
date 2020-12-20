@@ -5,6 +5,11 @@ const { replySending } = require('./reply')
 const { HookCallbackError } = require('./errors')
 const {
   kInjectTime,
+  kInjectIsStore,
+  kInjectStoreAtr,
+  kInjectStoreCtx,
+  kInjectAttribute,
+  kInjectContext,
   kRouteTime,
   kRouteRequest,
   kRouteReply,
@@ -142,6 +147,10 @@ function onBeforeInjectFlow (next) {
 }
 
 function onAfterInjectFlow (next) {
+  if (this[kInjectIsStore] === true) {
+    this[kInjectAttribute] = this[kInjectStoreAtr]
+    this[kInjectContext] = this[kInjectStoreCtx]
+  }
   runHooksAsync('onAfterInject', this)
     .then(() => next())
     .catch(e => next(e))

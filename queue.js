@@ -12,6 +12,9 @@ const {
   kInjectBeanify,
   kInjectParent,
   kInjectFlag,
+  kInjectIsStore,
+  kInjectStoreAtr,
+  kInjectStoreCtx,
   kRequestRoute,
   kReplyRoute,
   kReplyTo,
@@ -238,6 +241,7 @@ function addInject (opts, handler, parent) {
   inject[kInjectBeanify] = this
   inject[kInjectParent] = parent
   inject[kInjectFlag] = false
+  inject[kInjectIsStore] = false
   initInjectProperties.call(inject)
 
   if (parent instanceof Inject) {
@@ -260,6 +264,12 @@ function addInject (opts, handler, parent) {
     returned = new Promise((resolve, reject) => {
       function _handler (err, data) {
         if (this.$parent) {
+          if (this.$parent[kInjectIsStore] === false) {
+            this.$parent[kInjectStoreAtr] = this.$parent[kInjectAttribute]
+            this.$parent[kInjectStoreCtx] = this.$parent[kInjectContext]
+            this.$parent[kInjectIsStore] = true
+          }
+
           this.$parent[kInjectAttribute] = this.$attribute
           this.$parent[kInjectContext] = this.$context
         }

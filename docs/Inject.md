@@ -175,10 +175,18 @@ beanify
             console.log(data) // fifth
             console.log(this.$attribute) // { a: 10 }
             console.log(this.$context) // { c: 'this is c', ddd: 'this is ddd', fff: 'this is fff' }
+          },
+          onAfterInject () {
+            console.log(this.$attribute) // { c: 18888, a: 10 }
+            console.log(this.$context) // { c: 111 }
           }
         })
 
         console.log(data) // first
+        console.log(this.$attribute) // { b: 'aaaa', a: 10 }
+        console.log(this.$context) // { c: 111 }
+      },
+      onAfterInject () {
         console.log(this.$attribute) // { b: 'aaaa', a: 10 }
         console.log(this.$context) // { c: 111 }
       }
