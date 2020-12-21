@@ -56,9 +56,6 @@ beanify.route(
 beanify.route({
   url: 'math.add',
   handler (req, rep) {},
-  onError (e) {
-    // this : Beanify
-  },
   onBeforeHandler (req, rep) {
     // this ： Route
   },

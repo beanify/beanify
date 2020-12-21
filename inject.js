@@ -16,7 +16,7 @@ function Inject (opts) {
 
 Inject.prototype.inject = function (opts, handler) {
   if (!this[kInjectFlag]) {
-    return
+    return this
   }
   const { addInject } = require('./queue')
   const { $beanify } = this

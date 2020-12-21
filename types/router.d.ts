@@ -1,4 +1,3 @@
-import HOOK from './hooks'
 import { Beanify } from './beanify'
 import PINO from 'pino'
 
@@ -71,7 +70,6 @@ export interface Route {
   $log: Readonly<PINO.Logger>
 
   // hooks
-  onError?: HOOK.OnErrorCallback
   onBeforeHandler?: OnBeforeHandler<Route>
   onAfterHandler?: OnAfterHandler<Route>
 }
@@ -95,7 +93,6 @@ export interface Inject {
   $log: Readonly<PINO.Logger>
 
   // hooks
-  onError?: HOOK.OnErrorCallback
   onBeforeInject?: OnBeforeInject<Inject>
   onAfterInject?: onAfterInject<Inject>
 

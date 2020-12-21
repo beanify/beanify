@@ -43,9 +43,6 @@ const res = await beanify.inject(opts)
 beanify.route({
   url: 'math.add',
   handler (req, rep) {},
-  onError (e) {
-    // this : Beanify
-  },
   onBeforeInject () {
     // this ： Inject
   },
