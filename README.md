@@ -148,7 +148,8 @@ beanify
 
 ## Ecosystem
 
-<!-- - [beanify-plugin](https://github.com/beanify/beanify-plugin) -->
+- [beanify-plugin](https://github.com/beanify/beanify-plugin)
+- [beanify-autoload](https://github.com/beanify/beanify-autoload)
 
 <!-- * [beanify-cli](https://github.com/beanjs-framework/beanify-cli)
 * [beanify-env](https://github.com/beanjs-framework/beanify-env)
