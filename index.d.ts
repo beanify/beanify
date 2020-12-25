@@ -40,5 +40,8 @@ export {
   OnBeforeHandler,
   OnAfterHandler,
   Route,
-  Inject
+  RouteAttribute,
+  Inject,
+  InjectAttribute,
+  InjectContext
 } from './types/router'

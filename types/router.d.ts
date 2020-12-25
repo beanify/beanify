@@ -10,6 +10,18 @@ export interface Request {
   body?: any
 }
 
+export interface RouteAttribute {
+  [key: string]: unknown
+}
+
+export interface InjectAttribute {
+  [key: string]: unknown
+}
+
+export interface InjectContext {
+  [key: string]: unknown
+}
+
 export interface Reply {
   // methods
   error(err: Error): void
@@ -57,7 +69,7 @@ export type OnAfterHandler<R> = (
 export interface Route {
   // options
   url: string
-  attribute?: Record<string, unknown>
+  attribute?: RouteAttribute
   $queue?: string //  $pubsub is invalid when $queue is not empty
   $pubsub?: boolean //  $pubsub needs to return data if it is true
   $timeout?: number
@@ -66,7 +78,7 @@ export interface Route {
 
   // properties
   $beanify: Readonly<Beanify>
-  $attribute: Readonly<Record<string, unknown>>
+  $attribute: Readonly<RouteAttribute>
   $log: Readonly<PINO.Logger>
 
   // hooks
@@ -78,8 +90,8 @@ export interface Inject {
   // options
   url: string
   body?: any
-  attribute?: Record<string, unknown>
-  context?: Record<string, unknown>
+  attribute?: InjectAttribute
+  context?: InjectContext
   $pubsub?: boolean
   $timeout?: number
   $usePrefix?: boolean //  Add route prefix automatically ?
@@ -88,8 +100,8 @@ export interface Inject {
   // properties
   $parent: Readonly<Inject | undefined>
   $beanify: Readonly<Beanify>
-  $attribute: Readonly<Record<string, unknown>>
-  $context: Readonly<Record<string, unknown>>
+  $attribute: Readonly<InjectAttribute>
+  $context: Readonly<InjectContext>
   $log: Readonly<PINO.Logger>
 
   // hooks
