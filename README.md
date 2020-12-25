@@ -150,6 +150,9 @@ beanify
 
 - [beanify-plugin](https://github.com/beanify/beanify-plugin)
 - [beanify-autoload](https://github.com/beanify/beanify-autoload)
+- [beanify-env](https://github.com/beanify/beanify-env)
+- [beanify-ajv](https://github.com/beanify/beanify-ajv)
+- [beanify-url](https://github.com/beanify/beanify-url)
 
 <!-- * [beanify-cli](https://github.com/beanjs-framework/beanify-cli)
 * [beanify-env](https://github.com/beanjs-framework/beanify-env)
