@@ -164,11 +164,10 @@ function onAfterInjectFlow (next) {
 }
 
 function onBeforeHandlerFlow (next) {
-  const { url } = this
   const req = this[kRouteRequest]
   const rep = this[kRouteReply]
   const beginTime = Date.now()
-  this.$log.debug(`request incomming(${beginTime}): ${url}`)
+  this.$log.debug(`request incomming(${beginTime}): ${req.url}`)
   this[kRouteTime] = beginTime
   runHooksAsync('onBeforeHandler', this, req, rep)
     .then(() => next())
@@ -178,7 +177,6 @@ function onBeforeHandlerFlow (next) {
 function onAfterHandlerFlow (next) {
   const req = this[kRouteRequest]
   const rep = this[kRouteReply]
-  const { url } = this
   runHooksAsync('onAfterHandler', this, req, rep)
     .then(() => {
       rep[kReplySent] = true
@@ -191,8 +189,8 @@ function onAfterHandlerFlow (next) {
     .finally(() => {
       const btime = this[kRouteTime]
       const etime = Date.now()
-      this.$log.debug(`request completed(${etime}): ${url}`)
-      this.$log.info(`request duration(${etime - btime}ms):${url}`)
+      this.$log.debug(`request completed(${etime}): ${req.url}`)
+      this.$log.info(`request duration(${etime - btime}ms):${req.url}`)
     })
 }
 
