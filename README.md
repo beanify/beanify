@@ -155,6 +155,7 @@ beanify
 - [beanify-ajv](https://github.com/beanify/beanify-ajv)
 - [beanify-url](https://github.com/beanify/beanify-url)
 - [beanify-markdown](https://github.com/beanify/beanify-markdown)
+- [fastify-beanify](https://github.com/beanify/fastify-beanify)
 
 <!-- * [beanify-cli](https://github.com/beanjs-framework/beanify-cli)
 * [beanify-env](https://github.com/beanjs-framework/beanify-env)
