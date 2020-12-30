@@ -29,14 +29,14 @@ Node.js v10 LTS (10.16.0) or later.
 
 ## Environment
 
-- BEANIFY_NATS_URL: NATS connection url
-- BEANIFY_NATS_SERVERS: NATS connection servers
-- BEANIFY_NATS_USER: NATS authentication user
-- BEANIFY_NATS_PASS: NATS authentication password
-- BEANIFY_NATS_TOKEN: NATS authentication token
-- BEANIFY_PINO_LEVEL: Log level
-- BEANIFY_PINO_PRETTY: The log is output in pretty style
-- BEANIFY_ROUTER_PREFIX: Global URL prefix
+- BEANIFY_NATS_URL: will be mapped to the `nats.url`
+- BEANIFY_NATS_SERVERS: will be mapped to the `nats.servers`
+- BEANIFY_NATS_USER: will be mapped to the `nats.user`
+- BEANIFY_NATS_PASS: will be mapped to the `nats.pass`
+- BEANIFY_NATS_TOKEN: will be mapped to the `nats.token`
+- BEANIFY_PINO_LEVEL: will be mapped to the `pino.level`
+- BEANIFY_PINO_PRETTY: will be mapped to the `pino.printPretty`
+- BEANIFY_ROUTER_PREFIX: will be mapped to the `router.prefix`
 
 ## Install
 
@@ -148,11 +148,13 @@ beanify
 
 ## Ecosystem
 
+- [beanify-cli](https://github.com/beanify/beanify-cli)
 - [beanify-plugin](https://github.com/beanify/beanify-plugin)
 - [beanify-autoload](https://github.com/beanify/beanify-autoload)
 - [beanify-env](https://github.com/beanify/beanify-env)
 - [beanify-ajv](https://github.com/beanify/beanify-ajv)
 - [beanify-url](https://github.com/beanify/beanify-url)
+- [beanify-markdown](https://github.com/beanify/beanify-markdown)
 
 <!-- * [beanify-cli](https://github.com/beanjs-framework/beanify-cli)
 * [beanify-env](https://github.com/beanjs-framework/beanify-env)
