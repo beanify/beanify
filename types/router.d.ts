@@ -77,6 +77,7 @@ export interface Route {
   handler?: RouteHandler<Route>
 
   // properties
+  $parent: Route
   $beanify: Readonly<Beanify>
   $attribute: Readonly<RouteAttribute>
   $log: Readonly<PINO.Logger>

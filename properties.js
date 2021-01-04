@@ -13,6 +13,7 @@ const {
   kInjectContext,
   kRouteBeanify,
   kRouteAttribute,
+  kRouteParent,
   kReplySent,
   kReplyData
 } = require('./symbols')
@@ -25,6 +26,14 @@ function initProperties (props) {
       }
     })
   }
+}
+
+function initLogProperty () {
+  Object.defineProperty(this, '$log', {
+    get () {
+      return this.$beanify.$log
+    }
+  })
 }
 
 module.exports = {
@@ -49,25 +58,16 @@ module.exports = {
       $context: kInjectContext
     }
     initProperties.call(this, props)
-
-    Object.defineProperty(this, '$log', {
-      get () {
-        return this.$beanify.$log
-      }
-    })
+    initLogProperty.call(this)
   },
   initRouteProperties () {
     const props = {
+      $parent: kRouteParent,
       $beanify: kRouteBeanify,
       $attribute: kRouteAttribute
     }
     initProperties.call(this, props)
-
-    Object.defineProperty(this, '$log', {
-      get () {
-        return this.$beanify.$log
-      }
-    })
+    initLogProperty.call(this)
   },
   initReplyProperties () {
     const props = {
@@ -75,11 +75,6 @@ module.exports = {
       $data: kReplyData
     }
     initProperties.call(this, props)
-
-    Object.defineProperty(this, '$log', {
-      get () {
-        return this.$beanify.$log
-      }
-    })
+    initLogProperty.call(this)
   }
 }

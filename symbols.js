@@ -20,6 +20,7 @@ module.exports = {
   kRouteRequest: Symbol.for('route.request'),
   kRouteReply: Symbol.for('route.reply'),
   kRouteTime: Symbol('route.time'),
+  kRouteParent: Symbol('route.parent'),
   kInjectBeanify: Symbol('inject.beanify'),
   kInjectAttribute: Symbol('inject.attribute'),
   kInjectContext: Symbol('inject.context'),

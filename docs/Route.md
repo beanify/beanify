@@ -46,6 +46,7 @@ beanify.route(
 
 ### Properties
 
+- `$parent`: parent inject object
 - `$beanify`: the scope instance
 - `$attribute`: this property is used to transfer special data and will automatically merge the incidental information in the inject
 - `$log`: the logger instance. check [here](https://github.com/pinojs/pino/blob/master/docs/api.md#logger)

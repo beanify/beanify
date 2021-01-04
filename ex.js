@@ -18,9 +18,12 @@ beanify
         // throw new Error('message from handler')
       },
       onBeforeHandler (req, rep) {
+        // console.log(this.$parent)
+        this.$parent.a = 'asdadasd'
         // throw new Error('message from onBeforeHandler')
       },
       onAfterHandler (req, rep) {
+        console.log(this.a)
         // throw new Error('message from onAfterHandler')
       }
     })

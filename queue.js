@@ -7,6 +7,7 @@ const {
   kRouteBeanify,
   kRouteRequest,
   kRouteReply,
+  kRouteParent,
   kRouteAttribute,
   kInjectAttribute,
   kInjectBeanify,
@@ -102,6 +103,7 @@ function requestComing (payload, replyTo, url) {
   route[kRouteAttribute] = cattrs
   route[kRouteRequest] = req
   route[kRouteReply] = rep
+  route[kRouteParent] = this
 
   asyncLib.series(
     [
