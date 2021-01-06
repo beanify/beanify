@@ -1,4 +1,11 @@
-const { kInjectAttribute, kInjectContext, kInjectFlag } = require('./symbols')
+const {
+  kInjectAttribute,
+  kInjectContext,
+  kInjectFlag,
+  kInjectIsStore,
+  kInjectStoreAtr,
+  kInjectStoreCtx
+} = require('./symbols')
 const { InjectTimeoutError } = require('./errors')
 const Merge = require('merge')
 
@@ -95,6 +102,10 @@ function injectRequestFlow (next) {
     .catch(e => next(e))
     .finally(() => {
       this[kInjectFlag] = false
+      if (this[kInjectIsStore] === true) {
+        this[kInjectAttribute] = this[kInjectStoreAtr]
+        this[kInjectContext] = this[kInjectStoreCtx]
+      }
     })
 }
 

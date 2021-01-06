@@ -7,6 +7,11 @@ const {
 } = require('./symbols')
 
 function replySending (payload) {
+  if (this[kReplySent]) {
+    return
+  }
+
+  this[kReplySent] = true
   const url = this[kReplyTo]
   const {
     $beanify: { $nats },
@@ -25,30 +30,22 @@ function Reply () {
 }
 
 Reply.prototype.error = function (err) {
-  if (this[kReplySent]) {
-    return
-  }
-
-  this[kReplySent] = true
-  const route = this[kReplyRoute]
   const {
+    $attribute,
     $beanify: { $errio }
-  } = route
+  } = this[kReplyRoute]
 
   const errMsg = $errio.toObject(err)
   const payload = {
-    attrs: route.$attribute,
+    attrs: $attribute,
     err: errMsg
   }
+
   replySending.call(this, payload)
 }
 
 Reply.prototype.send = function (data) {
   if (!this[kReplyFlag]) {
-    return
-  }
-
-  if (this.$data) {
     return
   }
 
