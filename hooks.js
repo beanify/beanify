@@ -22,8 +22,8 @@ const hooks = {
   onAfterInject: []
 }
 
-const routeHooks = ['onError', 'onBeforeHandler', 'onAfterHandler']
-const injectHooks = ['onError', 'onBeforeInject', 'onAfterInject']
+const routeHooks = ['onBeforeHandler', 'onAfterHandler']
+const injectHooks = ['onBeforeInject', 'onAfterInject']
 
 function printError (e) {
   this.$log.error(e)
@@ -48,7 +48,7 @@ function addHook (name, fn) {
 
 function runHooks (name, ins, done, ...args) {
   if (!(name in hooks)) {
-    return
+    return done()
   }
 
   const doHooks = [...hooks[name]]

@@ -32,7 +32,7 @@ const { Inject, injectRequestFlow } = require('./inject')
 
 const Clone = require('clone')
 const FastQ = require('fastq')
-const AJV = require('ajv')
+const { default: AJV } = require('ajv')
 const Merge = require('merge')
 const asyncLib = require('async')
 const Request = require('./request')

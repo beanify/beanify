@@ -1,4 +1,4 @@
-const AJV = require('ajv')
+const { default: AJV } = require('ajv')
 const EnvSchema = require('env-schema')
 const Merge = require('merge')
 const path = require('path')

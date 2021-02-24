@@ -1,6 +1,6 @@
 {
   "name": "beanify",
-  "version": "3.0.9",
+  "version": "3.0.10",
   "description": "micro-services nats nats-micro-services",
   "main": "index.js",
   "scripts": {
@@ -35,7 +35,7 @@
     "url": "git+https://github.com/beanify/beanify.git"
   },
   "dependencies": {
-    "ajv": "^6.10.2",
+    "ajv": "^7.1.1",
     "async": "^3.2.0",
     "avvio": "^6.2.2",
     "clone": "^2.1.2",
@@ -49,5 +49,7 @@
     "semver": "^7.3.4",
     "super-error": "^2.4.0"
   },
-  "pre-commit": ["lint"]
+  "pre-commit": [
+    "lint"
+  ]
 }
