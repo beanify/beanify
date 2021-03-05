@@ -1,6 +1,6 @@
 {
   "name": "beanify",
-  "version": "3.0.10",
+  "version": "3.0.11",
   "description": "micro-services nats nats-micro-services",
   "main": "index.js",
   "scripts": {
@@ -49,7 +49,5 @@
     "semver": "^7.3.4",
     "super-error": "^2.4.0"
   },
-  "pre-commit": [
-    "lint"
-  ]
+  "pre-commit": ["lint"]
 }

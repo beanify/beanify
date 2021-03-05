@@ -42,6 +42,5 @@
       "properties": { "prefix": { "type": "string", "default": "" } },
       "default": {}
     }
-  },
-  "default": {}
+  }
 }

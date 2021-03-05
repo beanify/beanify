@@ -10,7 +10,7 @@
       "enum": ["fatal", "error", "warn", "info", "debug", "trace", "silent"],
       "default": "info"
     },
-    "BEANIFY_PINO_PRETTY": { "type": "boolean", "default": false },
+    "BEANIFY_PINO_PRETTY": { "type": "boolean" },
     "BEANIFY_ROUTER_PREFIX": { "type": "string", "default": "" }
   }
 }
