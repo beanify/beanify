@@ -40,7 +40,7 @@ module.exports = function beanifyOptions (opts) {
   opts = Merge.recursive(opts, envOpts)
 
   // process special
-  opts.pino.prettyPrint = opts.pino.pretty
+  opts.pino.prettyPrint = opts.pino.pretty || opts.pino.prettyPrint
   const cInfo = require(path.join(process.cwd(), 'package.json'))
   opts.pino.name = `[${cInfo.name}]`
 
