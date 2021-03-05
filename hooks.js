@@ -179,7 +179,7 @@ function onAfterHandlerFlow (next) {
       const btime = this[kRouteTime]
       const etime = Date.now()
       this.$log.debug(`request completed(${etime}): ${req.url}`)
-      this.$log.info(`request duration(${etime - btime}ms):${req.url}`)
+      this.$log.info(`request duration(${etime - btime}ms): ${req.url}`)
     })
 }
 
