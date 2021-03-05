@@ -7,8 +7,7 @@
     "BEANIFY_NATS_PASS": { "type": "string" },
     "BEANIFY_NATS_TOKEN": { "type": "string" },
     "BEANIFY_PINO_LEVEL": {
-      "enum": ["fatal", "error", "warn", "info", "debug", "trace", "silent"],
-      "default": "info"
+      "enum": ["fatal", "error", "warn", "info", "debug", "trace", "silent"]
     },
     "BEANIFY_PINO_PRETTY": { "type": "boolean" },
     "BEANIFY_ROUTER_PREFIX": { "type": "string", "default": "" }
