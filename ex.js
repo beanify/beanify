@@ -8,42 +8,46 @@ const beanify = Beanify({})
 // beanify.addHook('onRoute', function (route) {})
 
 beanify
-  .register(async (ins, opts) => {
-    ins.route({
-      url: 'math.add',
-      handler (req, rep) {
-        rep.send(req.body)
-        this.$attribute.val = req.body
-        // this.$attribute.p1.v1 = 'pppppp'
-        // throw new Error('message from handler')
-      },
-      onBeforeHandler (req, rep) {
-        // console.log(this.$parent)
-        this.$parent.a = 'asdadasd'
-        // throw new Error('message from onBeforeHandler')
-      },
-      onAfterHandler (req, rep) {
-        console.log(this.a)
-        // throw new Error('message from onAfterHandler')
-      }
-    })
-    ins.route({
-      url: 'math.sub',
-      handler (req, rep) {
-        rep.send(req.body)
-        this.$attribute.val = req.body
-        // this.$attribute.p1.v1 = 'pppppp'
-        // throw new Error('message from handler')
-      },
-      onBeforeHandler (req, rep) {
-        // throw new Error('message from onBeforeHandler')
-      },
-      onAfterHandler (req, rep) {
-        // throw new Error('message from onAfterHandler')
-      }
-    })
-  })
+  .register(
+    async (ins, opts) => {
+      ins.route({
+        url: 'math.add',
+        handler (req, rep) {
+          rep.send(req.body)
+          this.$attribute.val = req.body
+          // this.$attribute.p1.v1 = 'pppppp'
+          // throw new Error('message from handler')
+        },
+        onBeforeHandler (req, rep) {
+          // console.log(this.$parent)
+          this.$parent.a = 'asdadasd'
+          // throw new Error('message from onBeforeHandler')
+        },
+        onAfterHandler (req, rep) {
+          console.log(this.a)
+          // throw new Error('message from onAfterHandler')
+        }
+      })
+      ins.route({
+        url: 'math.sub',
+        handler (req, rep) {
+          rep.send(req.body)
+          this.$attribute.val = req.body
+          // this.$attribute.p1.v1 = 'pppppp'
+          // throw new Error('message from handler')
+        },
+        onBeforeHandler (req, rep) {
+          // throw new Error('message from onBeforeHandler')
+        },
+        onAfterHandler (req, rep) {
+          // throw new Error('message from onAfterHandler')
+        }
+      })
+    },
+    { name: 'ins1' }
+  )
   .ready(async () => {
+    beanify.print()
     beanify.inject({
       url: 'math.add',
       $usePrefix: true,
@@ -67,7 +71,6 @@ beanify
           d1,
           d2
         })
-        beanify.print()
       }
       // onBeforeInject () {},
       // onAfterInject () {}

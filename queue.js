@@ -127,6 +127,7 @@ function routerWorker (route, done) {
       if (e) {
         throwError(this, e)
       } else {
+        this[kBeanifyRoutes].push(route.url)
         done()
       }
     }
@@ -226,7 +227,6 @@ function addRoute (opts, handler) {
     }
   }
 
-  this[kBeanifyRoutes].push(route.url)
   this[kQueueRoutes].push(route)
 }
 
