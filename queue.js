@@ -39,6 +39,8 @@ const Request = require('./request')
 const { isArrow } = require('extra-function')
 const { Reply } = require('./reply')
 
+const { onParamsParserFlow, onParamsSerializer } = require('./params')
+
 const {
   routeHooks,
   injectHooks,
@@ -107,6 +109,7 @@ function requestComing (payload, replyTo, url) {
 
   asyncLib.series(
     [
+      onParamsSerializer.bind(route),
       onBeforeHandlerFlow.bind(route),
       doRouteHandlerFlow.bind(route),
       onAfterHandlerFlow.bind(route)
@@ -122,7 +125,11 @@ function requestComing (payload, replyTo, url) {
 
 function routerWorker (route, done) {
   asyncLib.series(
-    [onRouteFlow.bind(route), registerRouteFlow.bind(route)],
+    [
+      onRouteFlow.bind(route),
+      onParamsParserFlow.bind(route),
+      registerRouteFlow.bind(route)
+    ],
     e => {
       if (e) {
         throwError(this, e)
