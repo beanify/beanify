@@ -7,7 +7,9 @@ module.exports = {
   kBeanifyChildren: Symbol('beanify.children'),
   kBeanifyRoutes: Symbol('beanify.routes'),
   kBeanifyDecorates: Symbol('beanify.decorates'),
+
   kBeanifyPluginMeta: Symbol.for('beanify.plugin.meta'),
+
   kBeanifyAvvio: Symbol('beanify.avvio'),
   kBeanifyErrio: Symbol('beanify.errio'),
   kBeanifyPino: Symbol('beanify.pino'),
@@ -17,8 +19,8 @@ module.exports = {
   kRouteBeanify: Symbol('route.beanify'),
   kRouteSid: Symbol('route.sid'),
   kRouteAttribute: Symbol('route.attribute'),
-  kRouteRequest: Symbol.for('route.request'),
-  kRouteReply: Symbol.for('route.reply'),
+  kRouteRequest: Symbol('route.request'),
+  kRouteReply: Symbol('route.reply'),
   kRouteTime: Symbol('route.time'),
   kRouteParent: Symbol('route.parent'),
   kInjectBeanify: Symbol('inject.beanify'),
@@ -35,5 +37,7 @@ module.exports = {
   kReplyTo: Symbol('reply.to'),
   kReplySent: Symbol('reply.sent'),
   kReplyData: Symbol('reply.data'),
-  kReplyFlag: Symbol('reply.flag')
+  kReplyFlag: Symbol('reply.flag'),
+
+  kParamsPaths: Symbol('params.paths')
 }

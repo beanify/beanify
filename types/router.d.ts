@@ -8,6 +8,7 @@ export interface RouterOptions {
 export interface Request {
   url: string
   body?: any
+  params?: any
 }
 
 export interface RouteAttribute {
